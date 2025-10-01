@@ -1,0 +1,7 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Excluir todas las imágenes excepto el logo
+assets/img/*
+!assets/img/logo.png
