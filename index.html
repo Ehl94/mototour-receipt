@@ -151,10 +151,8 @@
                 display: block !important;
                 box-shadow: none !important;
                 -webkit-appearance: none !important;
-                appearance: none !important;
-                appearance: none !important;
-                appearance: none !important;
-                appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;  /* Una sola declaración */
             }
             
             .campo-valor {
@@ -450,11 +448,8 @@
             display: block !important;
             box-shadow: none !important;
             -webkit-appearance: none !important;
-<<<<<<< HEAD
             -moz-appearance: none !important;
             appearance: none !important;
-=======
->>>>>>> efd6ea867e332a8e1179181ac57aac2b77c00ebc
         }
         
         input:focus, select:focus {
@@ -472,11 +467,7 @@
     <div class="recibo" id="recibo">
         <div class="header">
             <div class="logo-centered">
-<<<<<<< HEAD
-                <img src="C:\Users\EmilioHuerta\Downloads\IMG_2780.PNG" alt="MOTO TRIBU Logo" class="moto-logo">
-=======
                 <img src="./assets/img/logo.png" alt="MOTO TRIBU Logo" class="moto-logo">
->>>>>>> efd6ea867e332a8e1179181ac57aac2b77c00ebc
                 <h2>COMPROBANTE DE RESERVA</h2>
             </div>
         </div>
@@ -689,38 +680,20 @@
                 input.parentNode.replaceChild(span, input);
             });
             
-            const html = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head>
-                    <meta charset='utf-8'>
-                    <title>Recibo MOTOTOUR</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 40px; }
-                        .header { text-align: center; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-                        .header h1 { color: #d32f2f; font-size: 28px; margin: 0; }
-                        .header h2 { font-size: 18px; margin: 5px 0; font-weight: normal; }
-                        .recibo-numero { text-align: right; margin-bottom: 20px; font-size: 14px; }
-                        .seccion { margin-bottom: 25px; }
-                        .seccion-titulo { background: #333; color: white; padding: 8px 15px; margin-bottom: 15px; font-weight: bold; font-size: 14px; }
-                        .campo { margin-bottom: 12px; }
-                        .campo-label { font-weight: bold; display: inline-block; min-width: 180px; }
-                        .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                        .tabla-resumen td { padding: 8px; border: 1px solid #ddd; }
-                        .tabla-resumen td:first-child { font-weight: bold; background: #f9f9f9; }
-                        .total { background: #333 !important; color: white !important; font-weight: bold; }
-                        .condiciones { background: #f9f9f9; padding: 15px; border-left: 4px solid #d32f2f; margin: 20px 0; font-size: 13px; }
-                        .condiciones ul { margin: 10px 0; padding-left: 20px; }
-                        .firmas { display: flex; justify-content: space-around; margin-top: 50px; }
-                        .firma { text-align: center; width: 40%; }
-                        .linea-firma { border-top: 2px solid #333; margin-top: 60px; padding-top: 8px; font-weight: bold; }
-                        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd; font-size: 12px; color: #666; }
-                    </style>
-                </head>
-                <body>${recibo.innerHTML}</body>
-                </html>
-            `;
+            // Crear el HTML de forma más segura
+            const htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="utf-8"><title>Recibo MOTOTOUR</title>' +
+                '<style>' +
+                'body { font-family: Arial, sans-serif; padding: 40px; }' +
+                '.header { text-align: center; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px; }' +
+                '.seccion-titulo { background: #333; color: white; padding: 8px 15px; margin-bottom: 15px; font-weight: bold; }' +
+                '.campo { margin-bottom: 12px; }' +
+                '.tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }' +
+                '.tabla-resumen td { padding: 8px; border: 1px solid #ddd; }' +
+                '</style></head>' +
+                '<body>' + recibo.innerHTML + '</body></html>';
             
-            const blob = new Blob(['\ufeff', html], {
+            const blob = new Blob(['\ufeff', htmlContent], {
                 type: 'application/msword'
             });
             
@@ -735,8 +708,4 @@
         }
     </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> efd6ea867e332a8e1179181ac57aac2b77c00ebc
