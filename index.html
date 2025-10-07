@@ -175,6 +175,41 @@
                 word-wrap: break-word;
                 overflow-wrap: break-word;
             }
+            
+            /* Ajustes para impresión desde móvil */
+            @media print and (max-width: 480px) {
+                .recibo {
+                    padding: 10pt !important;
+                    font-size: 8pt !important;
+                }
+                
+                .moto-logo {
+                    height: 60pt !important;
+                }
+                
+                .logo-centered h2 {
+                    font-size: 10pt !important;
+                    padding: 4pt 8pt !important;
+                }
+                
+                .seccion-titulo {
+                    font-size: 8pt !important;
+                    padding: 3pt 6pt !important;
+                }
+                
+                .campo {
+                    margin-bottom: 4pt !important;
+                    font-size: 7pt !important;
+                }
+                
+                .tabla-resumen {
+                    font-size: 7pt !important;
+                }
+                
+                .tabla-resumen td {
+                    padding: 2pt !important;
+                }
+            }
         }
         
         body {
@@ -228,15 +263,202 @@
             display: inline-block;
         }
         
-        /* Responsive design */
+        /* Responsive design - Mobile First */
         @media (max-width: 768px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            .recibo {
+                padding: 15px;
+                box-shadow: none;
+                margin: 0;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+            
             .moto-logo {
-                height: 130px;
+                height: 100px;
+                margin-bottom: 10px;
             }
             
             .logo-centered h2 {
-                font-size: 18px;
-                padding: 6px 14px;
+                font-size: 16px;
+                padding: 8px 16px;
+                margin: 0;
+            }
+            
+            .numero-fecha-container {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .numero-operacion,
+            .fecha-operacion {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .numero-operacion input,
+            .fecha-operacion input {
+                width: 120px;
+                flex-shrink: 0;
+            }
+            
+            .seccion-titulo {
+                font-size: 13px;
+                padding: 6px 10px;
+                margin-bottom: 10px;
+            }
+            
+            .campo {
+                flex-direction: column;
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .campo-label {
+                min-width: auto;
+                font-size: 13px;
+                color: #666;
+            }
+            
+            .campo-valor {
+                padding-left: 0;
+            }
+            
+            .campo-valor input,
+            .campo-valor select {
+                width: 100% !important;
+                font-size: 14px !important;
+                padding: 6px 0 !important;
+            }
+            
+            .tabla-resumen {
+                font-size: 12px;
+            }
+            
+            .tabla-resumen td {
+                padding: 6px !important;
+                word-wrap: break-word;
+            }
+            
+            .tabla-resumen td:first-child {
+                width: 50%;
+                font-size: 11px;
+            }
+            
+            .tabla-resumen input,
+            .tabla-resumen select {
+                width: calc(100% - 10px) !important;
+                font-size: 13px !important;
+            }
+            
+            .total input {
+                font-size: 14px !important;
+            }
+            
+            .condiciones {
+                font-size: 11px;
+                padding: 10px;
+                margin: 10px 0;
+            }
+            
+            .condiciones ul {
+                padding-left: 15px;
+            }
+            
+            .firmas {
+                flex-direction: column;
+                gap: 30px;
+                margin-top: 30px;
+            }
+            
+            .firma {
+                width: 100%;
+            }
+            
+            .linea-firma {
+                margin-top: 40px;
+                font-size: 12px;
+            }
+            
+            .footer {
+                font-size: 11px;
+                margin-top: 20px;
+                padding-top: 15px;
+            }
+            
+            .botones {
+                position: sticky;
+                top: 0;
+                background: white;
+                z-index: 100;
+                padding: 10px 0;
+                margin: 0 -10px 20px -10px;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            button {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+        
+        /* Extra small devices (phones in portrait mode) */
+        @media (max-width: 480px) {
+            body {
+                margin: 5px;
+                padding: 5px;
+                font-size: 12px;
+            }
+            
+            .recibo {
+                padding: 10px;
+            }
+            
+            .moto-logo {
+                height: 80px;
+            }
+            
+            .logo-centered h2 {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+            
+            .seccion-titulo {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+            
+            .campo-label {
+                font-size: 12px;
+            }
+            
+            .tabla-resumen {
+                font-size: 11px;
+            }
+            
+            .tabla-resumen td {
+                padding: 4px !important;
+            }
+            
+            .condiciones {
+                font-size: 10px;
+                padding: 8px;
+            }
+            
+            .footer {
+                font-size: 10px;
             }
         }
         
@@ -455,6 +677,43 @@
         input:focus, select:focus {
             outline: none;
             border-bottom: 2px solid #d32f2f;
+        }
+        
+        /* Mejoras para dispositivos táctiles */
+        @media (pointer: coarse) {
+            input, select {
+                min-height: 44px !important;
+                padding: 8px 0 !important;
+                font-size: 16px !important; /* Evita zoom automático en iOS */
+            }
+            
+            button {
+                min-height: 44px;
+                font-size: 16px;
+                touch-action: manipulation; /* Evita doble tap para zoom */
+            }
+            
+            .campo {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Estilos específicos para iOS */
+        @supports (-webkit-touch-callout: none) {
+            input, select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                border-radius: 0;
+            }
+            
+            input[type="date"], 
+            input[type="time"] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background: transparent;
+            }
         }
     </style>
 </head>
