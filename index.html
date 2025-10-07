@@ -2,9 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recibo MOTOTOUR - Moto Tribu</title>
     <style>
         @media print {
@@ -90,7 +88,14 @@
                 font-size: 9pt !important;
             }
             
-
+            .tabla-resumen {
+                font-size: 9pt !important;
+                margin-top: 5pt !important;
+            }
+            
+            .tabla-resumen td {
+                padding: 4pt !important;
+            }
             
             .condiciones {
                 font-size: 8pt !important;
@@ -170,54 +175,6 @@
                 word-wrap: break-word;
                 overflow-wrap: break-word;
             }
-            
-            /* Estilos de impresión para la imagen de firma */
-            .firma-imagen {
-                margin-bottom: 8pt !important;
-                padding: 0 !important;
-                background: transparent !important;
-                border: none !important;
-            }
-            
-            .imagen-firma {
-                max-width: 100pt !important;
-                max-height: 50pt !important;
-                height: auto !important;
-                width: auto !important;
-                object-fit: contain !important;
-                filter: contrast(1.2) brightness(0.8) !important;
-                border: none !important;
-                border-radius: 0 !important;
-            }
-            
-            /* Ajustes para impresión desde móvil */
-            @media print and (max-width: 480px) {
-                .recibo {
-                    padding: 10pt !important;
-                    font-size: 8pt !important;
-                }
-                
-                .moto-logo {
-                    height: 60pt !important;
-                }
-                
-                .logo-centered h2 {
-                    font-size: 10pt !important;
-                    padding: 4pt 8pt !important;
-                }
-                
-                .seccion-titulo {
-                    font-size: 8pt !important;
-                    padding: 3pt 6pt !important;
-                }
-                
-                .campo {
-                    margin-bottom: 4pt !important;
-                    font-size: 7pt !important;
-                }
-                
-
-            }
         }
         
         body {
@@ -271,873 +228,15 @@
             display: inline-block;
         }
         
-        /* iPhone 14 Pro Optimized Design (393x852px) */
+        /* Responsive design */
         @media (max-width: 768px) {
-            body {
-                margin: 0;
-                padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px) 16px;
-                font-size: 15px;
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                min-height: 100vh;
-                box-sizing: border-box;
-            }
-            
-            .recibo {
-                padding: 24px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-                margin: 0;
-                border-radius: 16px;
-                background: white;
-                border: 1px solid rgba(255,255,255,0.8);
-            }
-            
-            .header {
-                margin-bottom: 32px;
-                padding-bottom: 28px;
-                border-bottom: 2px solid #333;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .header::after {
-                content: '';
-                position: absolute;
-                bottom: -2px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 80px;
-                height: 4px;
-                background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
-                border-radius: 2px;
-            }
-            
             .moto-logo {
-                height: 140px;
-                margin-bottom: 20px;
-                filter: contrast(1.15) brightness(1.05) saturate(1.1);
-                transition: transform 0.3s ease;
-                max-width: 200px;
-                object-fit: contain;
+                height: 130px;
             }
             
             .logo-centered h2 {
-                font-size: 20px;
-                padding: 14px 28px;
-                margin: 8px 0 0 0;
-                border-radius: 12px;
-                font-weight: 700;
-                letter-spacing: 0.8px;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-                border: 2px solid #e0e0e0;
-            }
-            
-            .recibo-numero {
-                margin-bottom: 24px;
-                text-align: center;
-            }
-            
-
-
-            
-
-            
-
-            
-            .seccion {
-                background: white;
-                margin-bottom: 28px;
-                border-radius: 18px;
-                overflow: hidden;
-                box-shadow: 0 6px 24px rgba(0,0,0,0.1);
-                border: 1px solid #e8f5e8;
-                transition: all 0.3s ease;
-            }
-            
-            .seccion:hover {
-                box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-                transform: translateY(-2px);
-            }
-            
-            .saldo-pendiente {
-                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
-                border: none !important;
-                box-shadow: 0 8px 32px rgba(211, 47, 47, 0.4) !important;
-                border-radius: 16px !important;
-                margin-top: 24px !important;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .saldo-pendiente::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
-            }
-            
-            .saldo-pendiente .seccion-titulo {
-                background: rgba(0,0,0,0.15) !important;
-                color: white !important;
-                font-weight: 800 !important;
-                font-size: 15px !important;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-                padding: 18px 24px !important;
-                margin-bottom: 0 !important;
-                letter-spacing: 0.8px;
-                text-transform: uppercase;
-            }
-            
-            .saldo-pendiente .campo {
-                background: transparent !important;
-                border-bottom: none !important;
-                padding: 24px !important;
-            }
-            
-            .saldo-pendiente .campo-label {
-                color: white !important;
-                font-weight: 700 !important;
-                font-size: 13px !important;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-                margin-bottom: 16px !important;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
-            
-            .saldo-pendiente .saldo-input,
-            .saldo-pendiente input {
-                background: rgba(255,255,255,0.1) !important;
-                color: white !important;
-                border: 2px solid rgba(255,255,255,0.2) !important;
-                font-weight: 700 !important;
-                font-size: 28px !important;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-                text-align: center;
-                padding: 20px !important;
-                border-radius: 12px !important;
-                width: 100% !important;
-                box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
-                transition: all 0.3s ease;
-            }
-            
-            .saldo-pendiente .saldo-input:focus,
-            .saldo-pendiente input:focus {
-                background: rgba(255,255,255,0.2) !important;
-                border-color: rgba(255,255,255,0.6) !important;
-                box-shadow: 0 0 0 4px rgba(255,255,255,0.15), inset 0 2px 8px rgba(0,0,0,0.2) !important;
-                outline: none !important;
-                transform: scale(1.02);
-            }
-            
-            .saldo-pendiente input::placeholder {
-                color: rgba(255,255,255,0.6) !important;
-                font-weight: 600;
-            }
-            
-            .seccion-titulo {
-                font-size: 16px;
-                padding: 18px 28px;
-                margin-bottom: 0;
-                font-weight: 700;
-                letter-spacing: 0.6px;
-                background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
-                position: relative;
-                overflow: hidden;
-                color: white;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            }
-            
-            .seccion-titulo::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
-            }
-            
-            .campo {
-                flex-direction: column;
-                gap: 10px;
-                padding: 20px 24px;
-                border-bottom: 1px solid #f5f5f5;
-                margin-bottom: 0;
-                background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-                transition: background-color 0.3s ease;
-            }
-            
-            .campo:hover {
-                background: #fafafa;
-            }
-            
-            .campo:last-child {
-                border-bottom: none;
-                border-radius: 0 0 16px 16px;
-            }
-            
-            .campo:first-child {
-                border-radius: 0;
-            }
-            
-            .campo-label {
-                font-size: 14px;
-                color: #37474f;
-                font-weight: 600;
-                margin-bottom: 10px;
-                display: block;
-                letter-spacing: 0.3px;
-                text-transform: uppercase;
-                font-size: 12px;
-            }
-            
-            .campo-valor {
-                padding-left: 0;
-                position: relative;
-            }
-            
-            .campo-valor input,
-            .campo-valor select {
-                width: 100% !important;
-                font-size: 16px !important;
-                padding: 16px 20px !important;
-                border: 2px solid #e3f2fd !important;
-                border-radius: 12px !important;
-                background: white !important;
-                font-weight: 500;
-                color: #212529;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04), inset 0 2px 4px rgba(0,0,0,0.02);
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-            }
-            
-            .campo-valor input:focus,
-            .campo-valor select:focus {
-                border-color: #d32f2f !important;
-                background: white !important;
-                box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.12), 0 4px 16px rgba(0,0,0,0.08) !important;
-                transform: translateY(-2px) scale(1.01);
-                outline: none !important;
-            }
-            
-            .campo-valor input::placeholder,
-            .campo-valor select::placeholder {
-                color: #9e9e9e;
-                font-weight: 400;
-            }
-            
-            .tabla-resumen tr:hover td {
-                background-color: #fafafa;
-            }
-            
-            .tabla-resumen tr:last-child td {
-                border-bottom: none !important;
-            }
-            
-            .tabla-resumen td:first-child {
-                width: 50%;
-                font-size: 12px;
-                font-weight: 700;
-                background: linear-gradient(135deg, #f1f8ff 0%, #e8f5e8 100%);
-                color: #37474f;
-                text-transform: uppercase;
-                letter-spacing: 0.6px;
-                position: relative;
-            }
-            
-            .tabla-resumen td:first-child::after {
-                content: '';
-                position: absolute;
-                right: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 4px;
-                height: 60%;
-                background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
-                border-radius: 2px;
-            }
-            
-            .tabla-resumen input,
-            .tabla-resumen select {
-                width: 100% !important;
-                font-size: 16px !important;
-                padding: 14px 18px !important;
-                border: 2px solid #e3f2fd !important;
-                border-radius: 10px !important;
-                background: white !important;
-                font-weight: 600;
-                text-align: center;
-                color: #212529;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-            }
-            
-            .tabla-resumen input:focus,
-            .tabla-resumen select:focus {
-                border-color: #d32f2f !important;
-                background: white !important;
-                box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.12), 0 4px 16px rgba(0,0,0,0.08) !important;
-                outline: none !important;
-                transform: translateY(-1px) scale(1.01);
-            }
-            
-            .total {
-                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .total::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: linear-gradient(90deg, #ffeb3b 0%, #ffc107 100%);
-            }
-            
-            .total td {
-                color: white !important;
-                font-weight: 700 !important;
-                font-size: 16px !important;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            }
-            
-            .total input {
-                background: rgba(255,255,255,0.15) !important;
-                color: white !important;
-                border: 2px solid rgba(255,255,255,0.3) !important;
-                font-weight: 700 !important;
-                font-size: 18px !important;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            }
-            
-            .total input:focus {
-                background: rgba(255,255,255,0.25) !important;
-                border-color: rgba(255,255,255,0.8) !important;
-                box-shadow: 0 0 0 4px rgba(255,255,255,0.2) !important;
-            }
-            
-
-            
-            .condiciones {
-                font-size: 13px;
-                padding: 24px;
-                margin: 28px 0;
-                border-radius: 16px;
-                line-height: 1.7;
-                background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%);
-                border: 1px solid #ffcdd2;
-                box-shadow: 0 4px 16px rgba(211, 47, 47, 0.1);
-                position: relative;
-            }
-            
-            .condiciones::before {
-                content: '⚠️';
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                font-size: 24px;
-                opacity: 0.7;
-            }
-            
-            .condiciones strong {
-                color: #d32f2f;
-                font-weight: 700;
-                font-size: 14px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            
-            .condiciones ul {
-                padding-left: 20px;
-                margin: 12px 0;
-            }
-            
-            .condiciones li {
-                margin-bottom: 8px;
-                color: #37474f;
-            }
-            
-            .firmas {
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                padding: 32px 24px;
-                border-radius: 16px;
-                margin-top: 32px;
-                flex-direction: column;
-                gap: 40px;
-                box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-                border: 1px solid #e9ecef;
-            }
-            
-            .firma {
-                width: 100%;
-                text-align: center;
-                background: white;
-                padding: 24px;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                border: 2px dashed #e9ecef;
-                transition: all 0.3s ease;
-            }
-            
-            .firma:hover {
-                border-color: #d32f2f;
-                box-shadow: 0 4px 16px rgba(211, 47, 47, 0.1);
-            }
-            
-            .linea-firma {
-                margin-top: 60px;
-                font-size: 14px;
-                font-weight: 700;
-                color: #37474f;
-                position: relative;
-                padding-top: 12px;
-                border-top: 2px solid #333;
-            }
-            
-            .firma-imagen {
-                margin-bottom: 12px;
-                padding: 8px;
-                background: #f8f9fa;
-                border-radius: 8px;
-                border: 1px solid #e9ecef;
-            }
-            
-            .imagen-firma {
-                max-width: 120px;
-                max-height: 60px;
-                height: auto;
-                width: auto;
-                object-fit: contain;
-                filter: contrast(1.1) brightness(0.9);
-                border-radius: 4px;
-            }
-            
-            .footer {
-                font-size: 13px;
-                margin-top: 32px;
-                padding: 24px;
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                border-radius: 16px;
-                text-align: center;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                border: 1px solid #e9ecef;
-                color: #37474f;
-                line-height: 1.6;
-            }
-            
-            .footer strong {
-                color: #d32f2f;
-                font-size: 15px;
-            }
-            
-            .botones {
-                position: sticky;
-                top: env(safe-area-inset-top, 0);
-                background: linear-gradient(180deg, white 0%, rgba(255,255,255,0.95) 90%, rgba(255,255,255,0.9) 100%);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                z-index: 1000;
-                padding: 16px 0 20px 0;
-                margin: 0 -16px 24px -16px;
-                border-bottom: 1px solid rgba(0,0,0,0.1);
-                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-                margin: 0 -8px 25px -8px;
-            }
-            
-            button {
-                display: block;
-                width: calc(100% - 24px);
-                margin: 8px 12px;
-                padding: 18px 24px;
-                font-size: 16px;
-                border-radius: 16px;
-                font-weight: 700;
-                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
-                color: white;
-                border: none;
-                box-shadow: 0 6px 20px rgba(211, 47, 47, 0.3);
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            
-            button::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-                transition: left 0.6s;
-            }
-            
-            button:hover {
-                transform: translateY(-3px) scale(1.02);
-                box-shadow: 0 8px 24px rgba(211, 47, 47, 0.4);
-            }
-            
-            button:hover::before {
-                left: 100%;
-            }
-            
-            button:active {
-                transform: translateY(-1px) scale(0.98);
-                box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-            }
-            
-            /* Ocultar elementos de desktop y mostrar versión móvil */
-            .numero-fecha-container {
-                display: none !important;
-            }
-            
-            .tabla-resumen {
-                display: none !important;
-            }
-            
-            /* Versión móvil del número y fecha */
-            .recibo-numero-mobile {
-                display: block !important;
-            }
-            
-            /* Versión móvil del resumen de pago */
-            .resumen-pago-mobile {
-                display: block !important;
-            }
-            
-            /* Estilos especiales para la sección saldo pendiente móvil */
-            .saldo-pendiente {
-                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
-                border-radius: 16px !important;
-                box-shadow: 0 8px 24px rgba(211, 47, 47, 0.3) !important;
-                border: none !important;
-                margin-top: 24px !important;
-            }
-            
-            .saldo-pendiente .seccion-titulo {
-                background: transparent !important;
-                color: white !important;
-                font-size: 18px !important;
-                font-weight: 800 !important;
-                text-align: center !important;
-                padding: 20px 24px 16px 24px !important;
-                letter-spacing: 1px !important;
-            }
-            
-            .saldo-pendiente .seccion-titulo::after {
-                display: none !important;
-            }
-            
-            .saldo-pendiente .campo {
-                background: rgba(255,255,255,0.1) !important;
-                border-bottom: none !important;
-                padding: 24px !important;
-                margin: 0 20px 20px 20px !important;
-                border-radius: 16px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                gap: 16px !important;
-            }
-            
-            .saldo-pendiente .campo-label {
-                color: white !important;
-                font-size: 14px !important;
-                font-weight: 700 !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.8px !important;
-                text-align: center !important;
-                margin-bottom: 0 !important;
-            }
-            
-            .saldo-pendiente .campo-valor {
-                width: 100% !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-            }
-            
-            .saldo-input-mobile {
-                width: 90% !important;
-                max-width: 280px !important;
-                background: white !important;
-                color: #d32f2f !important;
-                border: 3px solid rgba(255,255,255,0.8) !important;
-                font-weight: 900 !important;
-                font-size: 24px !important;
-                text-align: center !important;
-                border-radius: 16px !important;
-                padding: 20px 24px !important;
-                box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.1) !important;
-                margin: 0 auto !important;
-                display: block !important;
-            }
-            
-            .saldo-input-mobile:focus {
-                background: white !important;
-                border-color: #fff !important;
-                box-shadow: 0 0 0 4px rgba(255,255,255,0.4), 0 6px 20px rgba(0,0,0,0.3) !important;
-                outline: none !important;
-                transform: scale(1.02) !important;
-            }
-        }
-        
-        /* iPhone 14 Pro Portrait Mode (393px and smaller) */
-        @media (max-width: 400px) {
-            body {
-                padding: env(safe-area-inset-top, 16px) 12px env(safe-area-inset-bottom, 16px) 12px;
-                font-size: 14px;
-            }
-            
-            .recibo {
-                padding: 20px;
-                border-radius: 14px;
-            }
-            
-            .moto-logo {
-                height: 85px;
-            }
-            
-            .logo-centered h2 {
-                font-size: 17px;
-                padding: 10px 18px;
-                border-radius: 10px;
-            }
-            
-
-            
-
-            
-            .seccion {
-                border-radius: 14px;
-                margin-bottom: 20px;
-            }
-            
-            .campo {
-                padding: 18px 20px;
-            }
-            
-            .campo-label {
-                font-size: 13px;
-                margin-bottom: 8px;
-            }
-            
-            .campo-valor input,
-            .campo-valor select {
-                font-size: 15px !important;
-                padding: 14px 16px !important;
-            }
-            
-            .tabla-resumen td {
-                padding: 16px 20px !important;
-            }
-            
-            .tabla-resumen input,
-            .tabla-resumen select {
-                font-size: 15px !important;
-                padding: 12px 14px !important;
-            }
-            
-            .condiciones {
-                padding: 20px;
-                font-size: 12px;
-            }
-            
-            .firmas {
-                padding: 28px 20px;
-            }
-            
-            .firma {
-                padding: 20px;
-            }
-            
-            .botones {
-                padding: 14px 0 18px 0;
-                margin: 0 -12px 20px -12px;
-            }
-            
-            button {
-                width: calc(100% - 20px);
-                margin: 6px 10px;
-                padding: 16px 20px;
-                font-size: 15px;
-            }
-            
-            .numero-operacion,
-            .fecha-operacion {
-                padding: 12px 16px;
-                border-radius: 8px;
-            }
-            
-            .numero-operacion input,
-            .fecha-operacion input {
-                min-width: 120px;
-                padding: 10px 14px;
-                font-size: 14px;
-            }
-            
-            .seccion {
-                border-radius: 10px;
-                margin-bottom: 20px;
-            }
-            
-            .seccion-titulo {
-                font-size: 13px;
-                padding: 12px 18px;
-            }
-            
-            .campo {
-                padding: 16px 18px;
-            }
-            
-            .campo-valor input,
-            .campo-valor select {
-                padding: 14px 16px !important;
-                font-size: 14px !important;
-                border-radius: 8px !important;
-            }
-            
-            .tabla-resumen {
-                border-radius: 10px;
-            }
-            
-            .tabla-resumen td {
-                padding: 14px 16px !important;
-            }
-            
-            .botones {
-                padding: 16px 0;
-                margin: 0 -8px 20px -8px;
-            }
-            
-            button {
-                padding: 16px 20px;
-                font-size: 14px;
-                border-radius: 10px;
-                margin: 8px 8px;
-            }
-            
-            .seccion-titulo {
-                font-size: 13px;
-                padding: 10px 15px;
-            }
-            
-            .campo {
-                padding: 12px 15px;
-            }
-            
-            .campo-label {
-                font-size: 12px;
-            }
-            
-            .campo-valor input,
-            .campo-valor select {
-                font-size: 14px !important;
-                padding: 8px 0 !important;
-            }
-            
-            .tabla-resumen {
-                font-size: 12px;
-            }
-            
-            .tabla-resumen td {
-                padding: 10px 12px !important;
-            }
-            
-            .tabla-resumen td:first-child {
-                font-size: 11px;
-            }
-            
-            .total td {
-                font-size: 14px !important;
-            }
-            
-            .total input {
-                font-size: 15px !important;
-            }
-            
-            .condiciones {
-                font-size: 11px;
-                padding: 12px;
-            }
-            
-            .firmas {
-                padding: 15px;
-            }
-            
-            .firma-imagen {
-                margin-bottom: 8px;
-                padding: 6px;
-                background: #f8f9fa;
-                border-radius: 6px;
-                border: 1px solid #e9ecef;
-            }
-            
-            .imagen-firma {
-                max-width: 100px;
-                max-height: 50px;
-                height: auto;
-                width: auto;
-                object-fit: contain;
-                filter: contrast(1.1) brightness(0.9);
-                border-radius: 4px;
-            }
-            
-            .footer {
-                font-size: 11px;
-                padding: 15px;
-            }
-            
-            .botones {
-                padding: 12px;
-            }
-            
-            button {
-                padding: 12px;
-                font-size: 13px;
-            }
-            
-            /* Ocultar elementos de desktop y mostrar versión móvil */
-            .numero-fecha-container {
-                display: none !important;
-            }
-            
-            .tabla-resumen {
-                display: none !important;
-            }
-            
-            .recibo-numero-mobile {
-                display: block !important;
-            }
-            
-            .resumen-pago-mobile {
-                display: block !important;
-            }
-            
-            /* Ajustes para pantalla pequeña */
-            .saldo-pendiente .seccion-titulo {
-                font-size: 16px !important;
-                padding: 16px 20px 12px 20px !important;
-            }
-            
-            .saldo-pendiente .campo {
-                padding: 20px !important;
-                margin: 0 16px 16px 16px !important;
-            }
-            
-            .saldo-input-mobile {
-                font-size: 20px !important;
-                padding: 16px 20px !important;
-                max-width: 250px !important;
+                font-size: 18px;
+                padding: 6px 14px;
             }
         }
         
@@ -1159,7 +258,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            width: 250px;
+            width: 250px
         }
 
         .numero-operacion input {
@@ -1169,10 +268,6 @@
         .fecha-operacion input {
             width: 130px;
         }
-
-
-
-
         
         .seccion {
             margin-bottom: 20px;
@@ -1308,19 +403,6 @@
             font-weight: bold;
         }
         
-        .firma-imagen {
-            margin-bottom: 10px;
-        }
-        
-        .imagen-firma {
-            max-width: 150px;
-            max-height: 80px;
-            height: auto;
-            width: auto;
-            object-fit: contain;
-            filter: contrast(1.1) brightness(0.9);
-        }
-        
         .footer {
             text-align: center;
             margin-top: 30px;
@@ -1374,56 +456,6 @@
             outline: none;
             border-bottom: 2px solid #d32f2f;
         }
-        
-        /* Mejoras para dispositivos táctiles */
-        @media (pointer: coarse) {
-            input, select {
-                min-height: 44px !important;
-                padding: 12px 0 !important;
-                font-size: 16px !important; /* Evita zoom automático en iOS */
-                transition: border-color 0.3s ease;
-            }
-            
-            button {
-                min-height: 48px;
-                font-size: 15px;
-                touch-action: manipulation; /* Evita doble tap para zoom */
-                transition: all 0.2s ease;
-            }
-            
-            button:active {
-                transform: scale(0.98);
-                background: #b71c1c;
-            }
-            
-            .campo {
-                margin-bottom: 0;
-            }
-            
-            /* Mejor experiencia táctil en inputs */
-            input:focus, select:focus {
-                transform: scale(1.02);
-                border-bottom-width: 3px !important;
-            }
-        }
-        
-        /* Estilos específicos para iOS */
-        @supports (-webkit-touch-callout: none) {
-            input, select {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-                border-radius: 0;
-            }
-            
-            input[type="date"], 
-            input[type="time"] {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-                background: transparent;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1447,21 +479,6 @@
                 </div>
                 <div class="fecha-operacion">
                     <strong>Fecha:</strong> <input type="date" id="fecha_emision">
-                </div>
-            </div>
-        </div>
-        
-        <!-- Versión móvil del número y fecha -->
-        <div class="recibo-numero-mobile" style="display: none;">
-            <div class="seccion">
-                <div class="seccion-titulo">INFORMACIÓN DE LA OPERACIÓN</div>
-                <div class="campo">
-                    <span class="campo-label">N° DE OPERACIÓN:</span>
-                    <span class="campo-valor"><input type="text" id="recibo_num_mobile" placeholder="0000"></span>
-                </div>
-                <div class="campo">
-                    <span class="campo-label">Fecha:</span>
-                    <span class="campo-valor"><input type="date" id="fecha_emision_mobile"></span>
                 </div>
             </div>
         </div>
@@ -1592,52 +609,6 @@
             </table>
         </div>
         
-        <!-- Versión móvil del resumen de pago -->
-        <div class="resumen-pago-mobile" style="display: none;">
-            <div class="seccion">
-                <div class="seccion-titulo">RESUMEN DE PAGO</div>
-                <div class="campo">
-                    <span class="campo-label">Precio por persona</span>
-                    <span class="campo-valor">$ <input type="text" id="pago_precio_mobile"></span>
-                </div>
-                <div class="campo">
-                    <span class="campo-label">Cantidad de personas</span>
-                    <span class="campo-valor"><input type="number" id="pago_cantidad_mobile" min="1"></span>
-                </div>
-                <div class="campo">
-                    <span class="campo-label">Subtotal</span>
-                    <span class="campo-valor">$ <input type="text" id="pago_subtotal_mobile"></span>
-                </div>
-                <div class="campo">
-                    <span class="campo-label">Seña / Anticipo abonado</span>
-                    <span class="campo-valor">$ <input type="text" id="pago_sena_mobile"></span>
-                </div>
-                <div class="campo">
-                    <span class="campo-label">Fecha de pago de seña</span>
-                    <span class="campo-valor"><input type="date" id="pago_fecha_sena_mobile"></span>
-                </div>
-                <div class="campo">
-                    <span class="campo-label">Método de pago</span>
-                    <span class="campo-valor">
-                        <select id="pago_metodo_mobile">
-                            <option value="">Seleccionar...</option>
-                            <option value="efectivo">Efectivo</option>
-                            <option value="transferencia">Transferencia bancaria</option>
-                            <option value="mercadopago">MercadoPago</option>
-                            <option value="tarjeta">Tarjeta de crédito/débito</option>
-                        </select>
-                    </span>
-                </div>
-            </div>
-            <div class="seccion saldo-pendiente">
-                <div class="seccion-titulo">SALDO PENDIENTE</div>
-                <div class="campo">
-                    <span class="campo-label">TOTAL A PAGAR:</span>
-                    <span class="campo-valor">$ <input type="text" id="pago_saldo_mobile" class="saldo-input-mobile"></span>
-                </div>
-            </div>
-        </div>
-        
         <div class="condiciones">
             <strong>CONDICIONES GENERALES Y POLÍTICA DE CANCELACIÓN:</strong>
             <ul>
@@ -1662,9 +633,6 @@
                 <div style="font-size: 12px;">DNI:_________________</div>
             </div>
             <div class="firma">
-                <div class="firma-imagen">
-                    <img src="./assets/img/firma.jpg" alt="Firma de la Organizadora" class="imagen-firma">
-                </div>
                 <div class="linea-firma">Firma de la Organizadora</div>
                 <div style="font-size: 12px;">DNI: 400-999-78 </div>
             </div>
@@ -1678,8 +646,13 @@
     
     <script>
         function imprimirPDF() {
-            // Ocultar elementos que no deben imprimirse
+            // Guardar estilos originales
             const botones = document.querySelector('.botones');
+            const originalBodyMargin = document.body.style.margin;
+            const originalBodyPadding = document.body.style.padding;
+            const originalBotonesDisplay = botones ? botones.style.display : '';
+            
+            // Ocultar elementos que no deben imprimirse
             if (botones) botones.style.display = 'none';
             
             // Optimizar para impresión
@@ -1689,12 +662,26 @@
             // Imprimir
             window.print();
             
-            // Restaurar elementos después de imprimir
+            // Restaurar elementos inmediatamente después de imprimir
             setTimeout(() => {
-                if (botones) botones.style.display = 'block';
-                document.body.style.margin = '';
-                document.body.style.padding = '';
-            }, 1000);
+                if (botones) {
+                    botones.style.display = originalBotonesDisplay || 'block';
+                }
+                document.body.style.margin = originalBodyMargin || '20px auto';
+                document.body.style.padding = originalBodyPadding || '20px';
+                
+                // Asegurar que la página vuelva a su estado normal
+                window.location.reload = false;
+            }, 500);
+            
+            // Backup: restaurar después de más tiempo por si acaso
+            setTimeout(() => {
+                if (botones && botones.style.display === 'none') {
+                    botones.style.display = 'block';
+                }
+                document.body.style.margin = '20px auto';
+                document.body.style.padding = '20px';
+            }, 2000);
         }
         
         function descargarWord() {
@@ -1712,20 +699,14 @@
                 input.parentNode.replaceChild(span, input);
             });
             
-            // Crear el HTML de forma más segura
-            const htmlContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
-                '<head><meta charset="utf-8"><title>Recibo MOTOTOUR</title>' +
-                '<style>' +
-                'body { font-family: Arial, sans-serif; padding: 40px; }' +
-                '.header { text-align: center; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px; }' +
-                '.seccion-titulo { background: #333; color: white; padding: 8px 15px; margin-bottom: 15px; font-weight: bold; }' +
-                '.campo { margin-bottom: 12px; }' +
-                '.tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }' +
-                '.tabla-resumen td { padding: 8px; border: 1px solid #ddd; }' +
-                '</style></head>' +
-                '<body>' + recibo.innerHTML + '</body></html>';
+            const htmlPart1 = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Recibo MOTOTOUR</title><style>';
+            const cssStyles = 'body { font-family: Arial, sans-serif; padding: 40px; } .header { text-align: center; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 30px; } .header h1 { color: #d32f2f; font-size: 28px; margin: 0; } .header h2 { font-size: 18px; margin: 5px 0; font-weight: normal; } .recibo-numero { text-align: right; margin-bottom: 20px; font-size: 14px; } .seccion { margin-bottom: 25px; } .seccion-titulo { background: #333; color: white; padding: 8px 15px; margin-bottom: 15px; font-weight: bold; font-size: 14px; } .campo { margin-bottom: 12px; } .campo-label { font-weight: bold; display: inline-block; min-width: 180px; } .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; } .tabla-resumen td { padding: 8px; border: 1px solid #ddd; } .tabla-resumen td:first-child { font-weight: bold; background: #f9f9f9; } .total { background: #333 !important; color: white !important; font-weight: bold; } .condiciones { background: #f9f9f9; padding: 15px; border-left: 4px solid #d32f2f; margin: 20px 0; font-size: 13px; } .condiciones ul { margin: 10px 0; padding-left: 20px; } .firmas { display: flex; justify-content: space-around; margin-top: 50px; } .firma { text-align: center; width: 40%; } .linea-firma { border-top: 2px solid #333; margin-top: 60px; padding-top: 8px; font-weight: bold; } .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd; font-size: 12px; color: #666; }';
+            const htmlPart2 = '</style></head><body>';
+            const htmlPart3 = '</body></html>';
             
-            const blob = new Blob(['\ufeff', htmlContent], {
+            const html = htmlPart1 + cssStyles + htmlPart2 + recibo.innerHTML + htmlPart3;
+            
+            const blob = new Blob(['\ufeff', html], {
                 type: 'application/msword'
             });
             
@@ -1738,51 +719,6 @@
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
         }
-        
-        // Sincronización entre versiones desktop y móvil
-        function sincronizarCampos() {
-            // Sincronizar número de operación y fecha
-            const reciboNum = document.getElementById('recibo_num');
-            const reciboNumMobile = document.getElementById('recibo_num_mobile');
-            const fechaEmision = document.getElementById('fecha_emision');
-            const fechaEmisionMobile = document.getElementById('fecha_emision_mobile');
-            
-            if (reciboNum && reciboNumMobile) {
-                reciboNum.addEventListener('input', () => reciboNumMobile.value = reciboNum.value);
-                reciboNumMobile.addEventListener('input', () => reciboNum.value = reciboNumMobile.value);
-            }
-            
-            if (fechaEmision && fechaEmisionMobile) {
-                fechaEmision.addEventListener('change', () => fechaEmisionMobile.value = fechaEmision.value);
-                fechaEmisionMobile.addEventListener('change', () => fechaEmision.value = fechaEmisionMobile.value);
-            }
-            
-            // Sincronizar campos de pago
-            const camposPago = [
-                ['pago_precio', 'pago_precio_mobile'],
-                ['pago_cantidad', 'pago_cantidad_mobile'],
-                ['pago_subtotal', 'pago_subtotal_mobile'],
-                ['pago_sena', 'pago_sena_mobile'],
-                ['pago_fecha_sena', 'pago_fecha_sena_mobile'],
-                ['pago_metodo', 'pago_metodo_mobile'],
-                ['pago_saldo', 'pago_saldo_mobile']
-            ];
-            
-            camposPago.forEach(([desktop, mobile]) => {
-                const desktopEl = document.getElementById(desktop);
-                const mobileEl = document.getElementById(mobile);
-                
-                if (desktopEl && mobileEl) {
-                    desktopEl.addEventListener('input', () => mobileEl.value = desktopEl.value);
-                    desktopEl.addEventListener('change', () => mobileEl.value = desktopEl.value);
-                    mobileEl.addEventListener('input', () => desktopEl.value = mobileEl.value);
-                    mobileEl.addEventListener('change', () => desktopEl.value = mobileEl.value);
-                }
-            });
-        }
-        
-        // Inicializar sincronización cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', sincronizarCampos);
     </script>
 </body>
 </html>
