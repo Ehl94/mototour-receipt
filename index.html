@@ -933,7 +933,7 @@
 
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const marginX = 65;
+                const marginX = 75;
                 const marginBottom = 40;
                 const contentWidth = pageWidth - marginX * 2;
                 let y = 40;
@@ -958,7 +958,7 @@
                 };
 
                 const campo = (etiqueta, valor) => {
-                    checkSpace(17);
+                    checkSpace(22);
                     const labelWidth = 150;
                     doc.setFont('helvetica', 'bold');
                     doc.setFontSize(9);
@@ -969,8 +969,8 @@
                     doc.text(String(valor || ''), marginX + labelWidth, y);
                     doc.setDrawColor(190, 190, 190);
                     doc.setLineWidth(0.5);
-                    doc.line(marginX + labelWidth, y + 3, marginX + contentWidth, y + 3);
-                    y += 16;
+                    doc.line(marginX + labelWidth, y + 4, marginX + contentWidth, y + 4);
+                    y += 21;
                 };
 
                 // Logo + título
@@ -1075,7 +1075,7 @@
                     startY: y,
                     margin: { left: marginX, right: marginX },
                     theme: 'grid',
-                    styles: { fontSize: 9, cellPadding: 5, textColor: [0, 0, 0], lineColor: [221, 221, 221], lineWidth: 0.75 },
+                    styles: { fontSize: 9, cellPadding: 9, textColor: [0, 0, 0], lineColor: [221, 221, 221], lineWidth: 0.75 },
                     columnStyles: {
                         0: { fontStyle: 'bold', fillColor: [249, 249, 249], cellWidth: contentWidth * 0.45 }
                     },
