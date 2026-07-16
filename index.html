@@ -945,9 +945,13 @@
                     }
                 };
 
+                const GRIS = [120, 120, 120];
+                const GRIS_CLARO = [235, 235, 235];
+                const GRIS_BORDE = [190, 190, 190];
+
                 const seccionTitulo = (texto) => {
                     checkSpace(26);
-                    doc.setFillColor(51, 51, 51);
+                    doc.setFillColor(...GRIS);
                     doc.rect(marginX, y, contentWidth, 18, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFont('helvetica', 'bold');
@@ -957,21 +961,27 @@
                     y += 18 + 8;
                 };
 
-                const campo = (etiqueta, valor) => {
-                    checkSpace(29);
-                    const labelWidth = 150;
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(9);
-                    doc.setTextColor(51, 51, 51);
-                    doc.text(etiqueta, marginX, y);
-                    doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(String(valor || ''), marginX + labelWidth, y);
-                    doc.setDrawColor(190, 190, 190);
-                    doc.setLineWidth(0.5);
-                    // Línea a mitad de fila: reparte el espacio en partes iguales arriba/abajo
-                    doc.line(marginX + labelWidth, y + 14, marginX + contentWidth, y + 14);
-                    y += 29;
+                // Tabla de datos label/valor, centrada en cada celda, con tema gris
+                const tablaDatos = (filas) => {
+                    doc.autoTable({
+                        startY: y,
+                        margin: { left: marginX, right: marginX },
+                        theme: 'grid',
+                        styles: {
+                            fontSize: 9,
+                            cellPadding: 8,
+                            textColor: [0, 0, 0],
+                            lineColor: GRIS_BORDE,
+                            lineWidth: 0.75,
+                            halign: 'center',
+                            valign: 'middle'
+                        },
+                        columnStyles: {
+                            0: { fontStyle: 'bold', fillColor: GRIS_CLARO, textColor: [80, 80, 80], cellWidth: contentWidth * 0.4 }
+                        },
+                        body: filas
+                    });
+                    y = doc.lastAutoTable.finalY + 14;
                 };
 
                 // Logo + título
@@ -1042,30 +1052,34 @@
 
                 // Datos de la organizadora
                 seccionTitulo('DATOS DE LA ORGANIZADORA');
-                campo('Nombre / Razón Social:', valorCampo('org_nombre'));
-                campo('CUIT / CUIL:', valorCampo('org_cuit'));
-                campo('Domicilio:', valorCampo('org_domicilio'));
-                campo('Teléfono / WhatsApp:', valorCampo('org_telefono'));
-                y += 4;
+                tablaDatos([
+                    ['Nombre / Razón Social:', valorCampo('org_nombre')],
+                    ['CUIT / CUIL:', valorCampo('org_cuit')],
+                    ['Domicilio:', valorCampo('org_domicilio')],
+                    ['Teléfono / WhatsApp:', valorCampo('org_telefono')]
+                ]);
 
                 // Datos del cliente
                 seccionTitulo('DATOS DEL CLIENTE / RESERVANTE');
-                campo('Nombre y Apellido:', valorCampo('cli_nombre'));
-                campo('DNI / Pasaporte:', valorCampo('cli_dni'));
-                campo('Domicilio:', valorCampo('cli_domicilio'));
-                campo('Teléfono / Celular:', valorCampo('cli_telefono'));
-                y += 4;
+                tablaDatos([
+                    ['Nombre y Apellido:', valorCampo('cli_nombre')],
+                    ['DNI / Pasaporte:', valorCampo('cli_dni')],
+                    ['Domicilio:', valorCampo('cli_domicilio')],
+                    ['Teléfono / Celular:', valorCampo('cli_telefono')]
+                ]);
 
                 // Detalles de la reserva
                 seccionTitulo('DETALLES DE LA RESERVA');
-                campo('Tour:', valorCampo('tour_nombre'));
-                campo('Fecha del Tour:', valorCampo('tour_fecha'));
-                campo('Hora de encuentro:', valorCampo('tour_hora'));
-                campo('Duración:', valorCampo('tour_duracion'));
-                campo('Cantidad de personas:', valorCampo('tour_personas'));
-                campo('Tipo de habitación:', valorCampo('tour_habitacion'));
-                campo('Tipo de moto:', valorCampo('tour_moto'));
-                campo('Servicios incluidos:', valorCampo('tour_servicios'));
+                tablaDatos([
+                    ['Tour:', valorCampo('tour_nombre')],
+                    ['Fecha del Tour:', valorCampo('tour_fecha')],
+                    ['Hora de encuentro:', valorCampo('tour_hora')],
+                    ['Duración:', valorCampo('tour_duracion')],
+                    ['Cantidad de personas:', valorCampo('tour_personas')],
+                    ['Tipo de habitación:', valorCampo('tour_habitacion')],
+                    ['Tipo de moto:', valorCampo('tour_moto')],
+                    ['Servicios incluidos:', valorCampo('tour_servicios')]
+                ]);
 
                 // Resumen de pago: siempre en una página nueva
                 doc.addPage();
@@ -1076,9 +1090,9 @@
                     startY: y,
                     margin: { left: marginX, right: marginX },
                     theme: 'grid',
-                    styles: { fontSize: 9, cellPadding: 9, textColor: [0, 0, 0], lineColor: [221, 221, 221], lineWidth: 0.75 },
+                    styles: { fontSize: 9, cellPadding: 9, textColor: [0, 0, 0], lineColor: GRIS_BORDE, lineWidth: 0.75, halign: 'center', valign: 'middle' },
                     columnStyles: {
-                        0: { fontStyle: 'bold', fillColor: [249, 249, 249], cellWidth: contentWidth * 0.45 }
+                        0: { fontStyle: 'bold', fillColor: GRIS_CLARO, textColor: [80, 80, 80], cellWidth: contentWidth * 0.45 }
                     },
                     body: [
                         ['Precio por persona', '$ ' + valorCampo('pago_precio')],
@@ -1091,7 +1105,7 @@
                     ],
                     didParseCell: (data) => {
                         if (data.row.raw === filaSaldo) {
-                            data.cell.styles.fillColor = [51, 51, 51];
+                            data.cell.styles.fillColor = GRIS;
                             data.cell.styles.textColor = [255, 255, 255];
                             data.cell.styles.fontStyle = 'bold';
                             data.cell.styles.fontSize = 11;
