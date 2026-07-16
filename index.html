@@ -2,13 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#333333">
+    <meta name="format-detection" content="telephone=no">
     <title>Recibo MOTOTOUR - Moto Tribu</title>
     <style>
         @media print {
             @page {
                 size: letter;
-                margin: 15mm 20mm;
+                margin: 10mm 15mm;
             }
             
             * {
@@ -69,17 +71,17 @@
             
             .seccion {
                 page-break-inside: avoid;
-                margin-bottom: 15pt !important;
+                margin-bottom: 10pt !important;
             }
             
             .seccion-titulo {
                 font-size: 10pt !important;
                 padding: 4pt 8pt !important;
-                margin-bottom: 8pt !important;
+                margin-bottom: 6pt !important;
             }
             
             .campo {
-                margin-bottom: 6pt !important;
+                margin-bottom: 4pt !important;
                 font-size: 9pt !important;
             }
             
@@ -121,7 +123,7 @@
             }
             
             .linea-firma {
-                margin-top: 30pt !important;
+                margin-top: 60pt !important;
                 font-size: 9pt !important;
             }
             
@@ -136,9 +138,10 @@
                 margin-bottom: 10pt !important;
             }
             
-            /* Forzar salto de página después de la sección de pago */
+            /* Permitir flujo normal pero evitar que la sección se parta a la mitad */
             .condiciones {
-                page-break-before: page !important;
+                page-break-before: auto !important;
+                page-break-inside: avoid !important;
             }
             
             input, select {
@@ -175,18 +178,83 @@
                 word-wrap: break-word;
                 overflow-wrap: break-word;
             }
+            
+            .firma-digital .firma-imagen {
+                height: 60pt !important;
+            }
+            
+            .firma-digital .firma-imagen img {
+                max-height: 80pt !important;
+            }
+
+            /* Ocultar todo lo demás cuando estemos imprimiendo en modo dinámico */
+            body.printing-mode > *:not(#print-container) {
+                display: none !important;
+            }
+            body.printing-mode #print-container {
+                display: block !important;
+            }
+            body.printing-mode #print-container .recibo {
+                padding: 0 !important;
+                box-shadow: none !important;
+                background: white !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
+            
+            .campo-valor-print {
+                display: block;
+                width: 100%;
+                min-height: 15pt;
+                border-bottom: 0.75pt solid #999;
+                font-size: 9pt;
+                padding: 3pt 0;
+            }
+            
+            .tabla-resumen .campo-valor-print {
+                display: inline-block !important;
+                width: auto !important;
+                min-width: 80px;
+                border-bottom: none !important;
+                padding: 0 !important;
+                min-height: auto !important;
+                vertical-align: middle !important;
+            }
+            
+            .total .campo-valor-print {
+                color: white !important;
+                font-weight: bold !important;
+            }
         }
         
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            width: min(100%, 800px);
             margin: 20px auto;
             padding: 20px;
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
             background: #f5f5f5;
             font-size: 14px;
             line-height: 1.4;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
+        img {
+            max-width: 100%;
+        }
+
         .recibo {
             background: white;
             padding: 30px;
@@ -398,7 +466,7 @@
         
         .linea-firma {
             border-top: 2px solid #333;
-            margin-top: 60px;
+            margin-top: 120px;
             padding-top: 8px;
             font-weight: bold;
         }
@@ -423,38 +491,198 @@
             border: none;
             padding: 12px 30px;
             margin: 0 10px;
+            min-height: 44px;
             cursor: pointer;
-            font-size: 14px;
-            border-radius: 4px;
+            font-size: 15px;
+            font-family: inherit;
+            border-radius: 8px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
         button:hover {
             background: #b71c1c;
         }
-        
+
         button:active {
             transform: scale(0.98);
+            background: #b71c1c;
         }
         
         input, select {
             border: none !important;
             border-bottom: 1px solid #999 !important;
             background: transparent !important;
-            font-family: Arial, sans-serif !important;
-            font-size: 14px !important;
+            font-family: inherit !important;
+            /* 16px evita el auto-zoom de Safari iOS al enfocar el campo */
+            font-size: 16px !important;
             width: 100% !important;
-            padding: 4px 0 !important;
+            min-height: 44px !important;
+            padding: 6px 0 !important;
             margin: 0 !important;
             display: block !important;
             box-shadow: none !important;
+            border-radius: 0 !important;
+            color: #333 !important;
             -webkit-appearance: none !important;
             -moz-appearance: none !important;
             appearance: none !important;
         }
-        
+
+        select {
+            /* Flecha propia porque anulamos la apariencia nativa */
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23666' d='M1 1l5 5 5-5'/></svg>") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 4px center !important;
+            padding-right: 22px !important;
+        }
+
         input:focus, select:focus {
             outline: none;
             border-bottom: 2px solid #d32f2f;
+        }
+        
+        .firma-digital {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .firma-digital .firma-imagen {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .firma-digital .firma-imagen img {
+            max-height: 150px;
+            width: auto;
+        }
+        
+        .firma-digital .linea-firma {
+            margin-top: 0 !important;
+            width: 100%;
+        }
+        
+        #print-container {
+            display: none;
+        }
+        
+        .campo-valor-print {
+            display: block;
+            width: 100%;
+            min-height: 20px;
+            border-bottom: 1px solid #ddd;
+            padding: 2px 0;
+        }
+        
+        /* Diseño para iPhone 13 Pro y superiores (anchos lógicos 375–440pt) */
+        @media (max-width: 600px) {
+            body {
+                margin: 0;
+                padding: 10px;
+                padding-left: max(10px, env(safe-area-inset-left));
+                padding-right: max(10px, env(safe-area-inset-right));
+                /* Deja hueco para la barra de acciones fija inferior */
+                padding-bottom: calc(80px + env(safe-area-inset-bottom));
+                background: #f5f5f5;
+            }
+
+            .recibo {
+                padding: 15px;
+                box-shadow: none;
+            }
+            
+            .numero-fecha-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .numero-operacion,
+            .fecha-operacion {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .numero-operacion input,
+            .fecha-operacion input {
+                width: 60% !important;
+                flex: none;
+            }
+            
+            .campo {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+                margin-bottom: 15px;
+            }
+            
+            .campo-label {
+                min-width: 0;
+                font-size: 13px;
+                color: #555;
+            }
+            
+            .campo-valor {
+                padding-left: 0;
+            }
+            
+            .tabla-resumen td {
+                white-space: normal !important;
+            }
+            
+            .tabla-resumen td:first-child {
+                width: 50%;
+                font-size: 13px;
+            }
+            
+            .firmas {
+                flex-direction: column;
+                align-items: center;
+                gap: 35px;
+                margin-top: 40px;
+            }
+            
+            .firma {
+                width: 80%;
+            }
+            
+            .linea-firma {
+                margin-top: 40px;
+            }
+            
+            .firma-digital .linea-firma {
+                margin-top: 0 !important;
+            }
+            
+            /* Barra de acciones fija al alcance del pulgar, sobre el home indicator */
+            .botones {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                margin: 0;
+                padding: 10px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
+                background: rgba(245, 245, 245, 0.95);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                border-top: 1px solid #ddd;
+            }
+
+            .botones button {
+                flex: 1;
+                width: auto;
+                margin: 0;
+                padding: 14px 12px;
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -475,7 +703,7 @@
         <div class="recibo-numero">
             <div class="numero-fecha-container">
                 <div class="numero-operacion">
-                    <strong>N° DE OPERACIÓN:</strong> <input type="text" id="recibo_num" placeholder="0000">
+                    <strong>N° DE OPERACIÓN:</strong> <input type="text" inputmode="numeric" autocomplete="off" id="recibo_num" placeholder="0000">
                 </div>
                 <div class="fecha-operacion">
                     <strong>Fecha:</strong> <input type="date" id="fecha_emision">
@@ -487,7 +715,7 @@
             <div class="seccion-titulo">DATOS DE LA ORGANIZADORA</div>
             <div class="campo">
                 <span class="campo-label">Nombre / Razón Social:</span>
-                <span class="campo-valor"><input type="text" id="tour_nombre" value="ALEXANDRA MERCEDES EREMA"></span>
+                <span class="campo-valor"><input type="text" id="org_nombre" value="ALEXANDRA MERCEDES EREMA"></span>
             </div>
             <div class="campo">
                 <span class="campo-label">CUIT / CUIL:</span>
@@ -499,7 +727,7 @@
             </div>
             <div class="campo">
                 <span class="campo-label">Teléfono / WhatsApp:</span>
-                <span class="campo-valor"><input type="text" id="org_telefono" value="+542216400709"></span>
+                <span class="campo-valor"><input type="tel" inputmode="tel" autocomplete="tel" id="org_telefono" value="+542216400709"></span>
             </div>
         </div>
         
@@ -507,19 +735,19 @@
             <div class="seccion-titulo">DATOS DEL CLIENTE / RESERVANTE</div>
             <div class="campo">
                 <span class="campo-label">Nombre y Apellido:</span>
-                <span class="campo-valor"><input type="text" id="cli_nombre"></span>
+                <span class="campo-valor"><input type="text" autocapitalize="words" autocomplete="name" enterkeyhint="next" id="cli_nombre"></span>
             </div>
             <div class="campo">
                 <span class="campo-label">DNI / Pasaporte:</span>
-                <span class="campo-valor"><input type="text" id="cli_dni"></span>
+                <span class="campo-valor"><input type="text" inputmode="numeric" autocomplete="off" id="cli_dni"></span>
             </div>
             <div class="campo">
                 <span class="campo-label">Domicilio:</span>
-                <span class="campo-valor"><input type="text" id="cli_domicilio"></span>
+                <span class="campo-valor"><input type="text" autocapitalize="words" autocomplete="street-address" id="cli_domicilio"></span>
             </div>
             <div class="campo">
                 <span class="campo-label">Teléfono / Celular:</span>
-                <span class="campo-valor"><input type="text" id="cli_telefono"></span>
+                <span class="campo-valor"><input type="tel" inputmode="tel" autocomplete="tel" id="cli_telefono"></span>
             </div>
         </div>
         
@@ -543,7 +771,7 @@
             </div>
             <div class="campo">
                 <span class="campo-label">Cantidad de personas:</span>
-                <span class="campo-valor"><input type="number" id="tour_personas" min="1"></span>
+                <span class="campo-valor"><input type="number" inputmode="numeric" id="tour_personas" min="1"></span>
             </div>
             <div class="campo">
                 <span class="campo-label">Tipo de habitación:</span>
@@ -572,19 +800,19 @@
             <table class="tabla-resumen">
                 <tr>
                     <td>Precio por persona</td>
-                    <td>$ <input type="text" id="pago_precio"></td>
+                    <td>$ <input type="text" inputmode="decimal" id="pago_precio"></td>
                 </tr>
                 <tr>
                     <td>Cantidad de personas</td>
-                    <td><input type="number" id="pago_cantidad" min="1"></td>
+                    <td><input type="number" inputmode="numeric" id="pago_cantidad" min="1"></td>
                 </tr>
                 <tr>
                     <td>Subtotal</td>
-                    <td>$ <input type="text" id="pago_subtotal"></td>
+                    <td>$ <input type="text" inputmode="decimal" id="pago_subtotal"></td>
                 </tr>
                 <tr>
                     <td>Seña / Anticipo abonado</td>
-                    <td>$ <input type="text" id="pago_sena"></td>
+                    <td>$ <input type="text" inputmode="decimal" id="pago_sena"></td>
                 </tr>
                 <tr>
                     <td>Fecha de pago de seña</td>
@@ -604,7 +832,7 @@
                 </tr>
                 <tr class="total">
                     <td>SALDO PENDIENTE</td>
-                    <td>$ <input type="text" id="pago_saldo" class="saldo-input"></td>
+                    <td>$ <input type="text" inputmode="decimal" id="pago_saldo" class="saldo-input"></td>
                 </tr>
             </table>
         </div>
@@ -632,7 +860,10 @@
                 <div class="linea-firma">Firma del Cliente</div>
                 <div style="font-size: 12px;">DNI:_________________</div>
             </div>
-            <div class="firma">
+            <div class="firma firma-digital">
+                <div class="firma-imagen">
+                    <img src="./assets/img/firma.png" alt="Firma Organizadora">
+                </div>
                 <div class="linea-firma">Firma de la Organizadora</div>
                 <div style="font-size: 12px;">DNI: 400-999-78 </div>
             </div>
@@ -646,42 +877,63 @@
     
     <script>
         function imprimirPDF() {
-            // Guardar estilos originales
-            const botones = document.querySelector('.botones');
-            const originalBodyMargin = document.body.style.margin;
-            const originalBodyPadding = document.body.style.padding;
-            const originalBotonesDisplay = botones ? botones.style.display : '';
+            // Clonar el recibo para la versión de impresión
+            const originalRecibo = document.getElementById('recibo');
+            const printVersion = originalRecibo.cloneNode(true);
             
-            // Ocultar elementos que no deben imprimirse
-            if (botones) botones.style.display = 'none';
+            // Reemplazar todos los inputs y selectores con texto plano
+            const inputs = printVersion.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                const span = document.createElement('span');
+                
+                if (input.tagName.toLowerCase() === 'select') {
+                    const selectedOption = input.options[input.selectedIndex];
+                    span.textContent = selectedOption && selectedOption.value ? selectedOption.text : '';
+                } else if (input.type === 'date') {
+                    if (input.value) {
+                        const parts = input.value.split('-');
+                        span.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    } else {
+                        span.textContent = '';
+                    }
+                } else {
+                    span.textContent = input.value || '';
+                }
+                
+                span.className = 'campo-valor-print';
+                if (input.classList.contains('saldo-input') || input.id === 'pago_saldo') {
+                    span.style.fontWeight = 'bold';
+                }
+                
+                input.parentNode.replaceChild(span, input);
+            });
             
-            // Optimizar para impresión
-            document.body.style.margin = '0';
-            document.body.style.padding = '0';
+            // Crear contenedor de impresión temporal
+            const printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+            printContainer.appendChild(printVersion);
+            document.body.appendChild(printContainer);
             
-            // Imprimir
+            // Activar modo impresión
+            document.body.classList.add('printing-mode');
+            
+            // Función de limpieza para restaurar el estado original de la página
+            const limpiarPrint = () => {
+                document.body.classList.remove('printing-mode');
+                if (printContainer.parentNode) {
+                    printContainer.parentNode.removeChild(printContainer);
+                }
+                window.removeEventListener('afterprint', limpiarPrint);
+            };
+            
+            // Registrar limpiador en afterprint
+            window.addEventListener('afterprint', limpiarPrint);
+            
+            // Disparar la impresión
             window.print();
             
-            // Restaurar elementos inmediatamente después de imprimir
-            setTimeout(() => {
-                if (botones) {
-                    botones.style.display = originalBotonesDisplay || 'block';
-                }
-                document.body.style.margin = originalBodyMargin || '20px auto';
-                document.body.style.padding = originalBodyPadding || '20px';
-                
-                // Asegurar que la página vuelva a su estado normal
-                window.location.reload = false;
-            }, 500);
-            
-            // Backup: restaurar después de más tiempo por si acaso
-            setTimeout(() => {
-                if (botones && botones.style.display === 'none') {
-                    botones.style.display = 'block';
-                }
-                document.body.style.margin = '20px auto';
-                document.body.style.padding = '20px';
-            }, 2000);
+            // Fallback por si el navegador no soporta afterprint
+            setTimeout(limpiarPrint, 1500);
         }
         
         function descargarWord() {
