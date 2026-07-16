@@ -698,8 +698,8 @@
 </head>
 <body>
     <div class="botones no-print">
-        <button onclick="imprimirPDF()">🖨️ Imprimir / Guardar como PDF</button>
-        <button onclick="descargarWord()">📄 Descargar como Word</button>
+        <button id="btn-pdf" onclick="generarPDF()">📄 Generar PDF</button>
+        <button onclick="descargarWord()">📝 Descargar como Word</button>
     </div>
     
     <div class="recibo" id="recibo">
@@ -885,67 +885,310 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
     <script>
-        function imprimirPDF() {
-            // Clonar el recibo para la versión de impresión
-            const originalRecibo = document.getElementById('recibo');
-            const printVersion = originalRecibo.cloneNode(true);
-            
-            // Reemplazar todos los inputs y selectores con texto plano
-            const inputs = printVersion.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                const span = document.createElement('span');
-                
-                if (input.tagName.toLowerCase() === 'select') {
-                    const selectedOption = input.options[input.selectedIndex];
-                    span.textContent = selectedOption && selectedOption.value ? selectedOption.text : '';
-                } else if (input.type === 'date') {
-                    if (input.value) {
-                        const parts = input.value.split('-');
-                        span.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                    } else {
-                        span.textContent = '';
-                    }
-                } else {
-                    span.textContent = input.value || '';
-                }
-                
-                span.className = 'campo-valor-print';
-                if (input.classList.contains('saldo-input') || input.id === 'pago_saldo') {
-                    span.style.fontWeight = 'bold';
-                }
-                
-                input.parentNode.replaceChild(span, input);
-            });
-            
-            // Crear contenedor de impresión temporal
-            const printContainer = document.createElement('div');
-            printContainer.id = 'print-container';
-            printContainer.appendChild(printVersion);
-            document.body.appendChild(printContainer);
-            
-            // Activar modo impresión
-            document.body.classList.add('printing-mode');
-            
-            // Función de limpieza para restaurar el estado original de la página
-            const limpiarPrint = () => {
-                document.body.classList.remove('printing-mode');
-                if (printContainer.parentNode) {
-                    printContainer.parentNode.removeChild(printContainer);
-                }
-                window.removeEventListener('afterprint', limpiarPrint);
-            };
-            
-            // Registrar limpiador en afterprint
-            window.addEventListener('afterprint', limpiarPrint);
-            
-            // Disparar la impresión
-            window.print();
-            
-            // Fallback por si el navegador no soporta afterprint
-            setTimeout(limpiarPrint, 1500);
+        // Lee el valor "para mostrar" de un input/select del formulario
+        function valorCampo(id) {
+            const el = document.getElementById(id);
+            if (!el) return '';
+            if (el.tagName.toLowerCase() === 'select') {
+                const opt = el.options[el.selectedIndex];
+                return opt && opt.value ? opt.text : '';
+            }
+            if (el.type === 'date') {
+                if (!el.value) return '';
+                const [anio, mes, dia] = el.value.split('-');
+                return `${dia}/${mes}/${anio}`;
+            }
+            return el.value || '';
         }
-        
+
+        // Carga una imagen local como dataURL (necesario para incrustarla en el PDF)
+        function cargarImagen(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    resolve({ dataUrl: canvas.toDataURL('image/png'), w: img.naturalWidth, h: img.naturalHeight });
+                };
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        // Genera el PDF directamente (sin pasar por el diálogo de impresión del navegador)
+        async function generarPDF() {
+            const boton = document.getElementById('btn-pdf');
+            const textoOriginal = boton.textContent;
+            boton.disabled = true;
+            boton.textContent = '⏳ Generando...';
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const marginX = 40;
+                const marginBottom = 40;
+                const contentWidth = pageWidth - marginX * 2;
+                let y = 40;
+
+                const checkSpace = (needed) => {
+                    if (y + needed > pageHeight - marginBottom) {
+                        doc.addPage();
+                        y = 40;
+                    }
+                };
+
+                const seccionTitulo = (texto) => {
+                    checkSpace(26);
+                    doc.setFillColor(51, 51, 51);
+                    doc.rect(marginX, y, contentWidth, 18, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(10);
+                    doc.text(texto, marginX + 8, y + 12.5);
+                    doc.setTextColor(0, 0, 0);
+                    y += 18 + 8;
+                };
+
+                const campo = (etiqueta, valor) => {
+                    checkSpace(17);
+                    const labelWidth = 150;
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(9);
+                    doc.setTextColor(51, 51, 51);
+                    doc.text(etiqueta, marginX, y);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(String(valor || ''), marginX + labelWidth, y);
+                    doc.setDrawColor(190, 190, 190);
+                    doc.setLineWidth(0.5);
+                    doc.line(marginX + labelWidth, y + 3, marginX + contentWidth, y + 3);
+                    y += 16;
+                };
+
+                // Logo + título
+                let logoImg = null, firmaImg = null;
+                try {
+                    [logoImg, firmaImg] = await Promise.all([
+                        cargarImagen('./assets/img/logo.png'),
+                        cargarImagen('./assets/img/firma.png')
+                    ]);
+                } catch (e) {
+                    console.warn('No se pudieron cargar las imágenes para el PDF', e);
+                }
+
+                if (logoImg) {
+                    const logoH = 60;
+                    const logoW = logoH * (logoImg.w / logoImg.h);
+                    doc.addImage(logoImg.dataUrl, 'PNG', (pageWidth - logoW) / 2, y, logoW, logoH);
+                    y += logoH + 8;
+                }
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+                const tituloTexto = 'COMPROBANTE DE RESERVA';
+                const tituloWidth = doc.getTextWidth(tituloTexto) + 24;
+                doc.setDrawColor(153, 153, 153);
+                doc.setFillColor(249, 249, 249);
+                doc.roundedRect((pageWidth - tituloWidth) / 2, y, tituloWidth, 22, 3, 3, 'FD');
+                doc.setTextColor(51, 51, 51);
+                doc.text(tituloTexto, pageWidth / 2, y + 14.5, { align: 'center' });
+                doc.setTextColor(0, 0, 0);
+                y += 22 + 10;
+
+                doc.setDrawColor(51, 51, 51);
+                doc.setLineWidth(1.5);
+                doc.line(marginX, y, marginX + contentWidth, y);
+                y += 18;
+
+                // N° de operación y fecha
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                const numOperTxt = `N° DE OPERACIÓN: `;
+                const numOperVal = valorCampo('recibo_num') || '0000';
+                const fechaTxt = `Fecha: `;
+                const fechaVal = valorCampo('fecha_emision') || 'dd/mm/aaaa';
+                const bloque1 = numOperTxt + numOperVal;
+                const bloque2 = fechaTxt + fechaVal;
+                doc.setFont('helvetica', 'bold');
+                const w1 = doc.getTextWidth(numOperTxt);
+                const w1v = doc.getTextWidth(numOperVal);
+                const w2 = doc.getTextWidth(fechaTxt);
+                const w2v = doc.getTextWidth(fechaVal);
+                doc.setFont('helvetica', 'normal');
+                const gap = 30;
+                const totalW = w1 + w1v + gap + w2 + w2v;
+                let cx = (pageWidth - totalW) / 2;
+                doc.setFont('helvetica', 'bold');
+                doc.text(numOperTxt, cx, y);
+                cx += w1;
+                doc.setFont('helvetica', 'normal');
+                doc.text(numOperVal, cx, y);
+                cx += w1v + gap;
+                doc.setFont('helvetica', 'bold');
+                doc.text(fechaTxt, cx, y);
+                cx += w2;
+                doc.setFont('helvetica', 'normal');
+                doc.text(fechaVal, cx, y);
+                y += 20;
+
+                // Datos de la organizadora
+                seccionTitulo('DATOS DE LA ORGANIZADORA');
+                campo('Nombre / Razón Social:', valorCampo('org_nombre'));
+                campo('CUIT / CUIL:', valorCampo('org_cuit'));
+                campo('Domicilio:', valorCampo('org_domicilio'));
+                campo('Teléfono / WhatsApp:', valorCampo('org_telefono'));
+                y += 4;
+
+                // Datos del cliente
+                seccionTitulo('DATOS DEL CLIENTE / RESERVANTE');
+                campo('Nombre y Apellido:', valorCampo('cli_nombre'));
+                campo('DNI / Pasaporte:', valorCampo('cli_dni'));
+                campo('Domicilio:', valorCampo('cli_domicilio'));
+                campo('Teléfono / Celular:', valorCampo('cli_telefono'));
+                y += 4;
+
+                // Detalles de la reserva
+                seccionTitulo('DETALLES DE LA RESERVA');
+                campo('Tour:', valorCampo('tour_nombre'));
+                campo('Fecha del Tour:', valorCampo('tour_fecha'));
+                campo('Hora de encuentro:', valorCampo('tour_hora'));
+                campo('Duración:', valorCampo('tour_duracion'));
+                campo('Cantidad de personas:', valorCampo('tour_personas'));
+                campo('Tipo de habitación:', valorCampo('tour_habitacion'));
+                campo('Tipo de moto:', valorCampo('tour_moto'));
+                campo('Servicios incluidos:', valorCampo('tour_servicios'));
+                y += 4;
+
+                // Resumen de pago
+                seccionTitulo('RESUMEN DE PAGO');
+                const filaSaldo = ['SALDO PENDIENTE', '$ ' + valorCampo('pago_saldo')];
+                doc.autoTable({
+                    startY: y,
+                    margin: { left: marginX, right: marginX },
+                    theme: 'grid',
+                    styles: { fontSize: 9, cellPadding: 5, textColor: [0, 0, 0], lineColor: [221, 221, 221], lineWidth: 0.75 },
+                    columnStyles: {
+                        0: { fontStyle: 'bold', fillColor: [249, 249, 249], cellWidth: contentWidth * 0.45 }
+                    },
+                    body: [
+                        ['Precio por persona', '$ ' + valorCampo('pago_precio')],
+                        ['Cantidad de personas', valorCampo('pago_cantidad')],
+                        ['Subtotal', '$ ' + valorCampo('pago_subtotal')],
+                        ['Seña / Anticipo abonado', '$ ' + valorCampo('pago_sena')],
+                        ['Fecha de pago de seña', valorCampo('pago_fecha_sena')],
+                        ['Método de pago', valorCampo('pago_metodo')],
+                        filaSaldo
+                    ],
+                    didParseCell: (data) => {
+                        if (data.row.raw === filaSaldo) {
+                            data.cell.styles.fillColor = [51, 51, 51];
+                            data.cell.styles.textColor = [255, 255, 255];
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fontSize = 11;
+                        }
+                    }
+                });
+                y = doc.lastAutoTable.finalY + 14;
+
+                // Condiciones generales
+                const condicionesItems = [
+                    { texto: 'La reserva queda confirmada una vez abonada la seña establecida.', indent: 0 },
+                    { texto: 'El saldo restante debe ser abonado antes del inicio del tour.', indent: 0 },
+                    { texto: 'Cancelaciones:', indent: 0 },
+                    { texto: 'Con más de 30 días de anticipación: devolución del 90% de la seña.', indent: 14 },
+                    { texto: 'Entre 10 y 30 días de anticipación: devolución del 60% de la seña.', indent: 14 },
+                    { texto: 'Menos de 10 días de anticipación: sin devolución.', indent: 14 },
+                    { texto: 'La organizadora no se responsabiliza por daños ocasionados por mal uso de la motocicleta.', indent: 0 },
+                    { texto: 'El cliente debe contar con licencia de conducir vigente.', indent: 0 },
+                    { texto: 'Las condiciones climáticas pueden modificar el itinerario sin previo aviso.', indent: 0 }
+                ];
+                doc.setFontSize(8);
+                const condPadding = 8;
+                const lineHeight = 10.5;
+                let lineasCond = [{ texto: 'CONDICIONES GENERALES Y POLÍTICA DE CANCELACIÓN:', bold: true, indent: 0 }];
+                condicionesItems.forEach((item) => {
+                    doc.setFont('helvetica', 'normal');
+                    const wrapped = doc.splitTextToSize('•  ' + item.texto, contentWidth - condPadding * 2 - item.indent);
+                    wrapped.forEach((linea, idx) => {
+                        lineasCond.push({ texto: linea, bold: false, indent: item.indent });
+                    });
+                });
+                const condHeight = condPadding * 2 + lineasCond.length * lineHeight;
+                checkSpace(condHeight);
+                doc.setFillColor(249, 249, 249);
+                doc.rect(marginX, y, contentWidth, condHeight, 'F');
+                doc.setFillColor(211, 47, 47);
+                doc.rect(marginX, y, 3, condHeight, 'F');
+                let ly = y + condPadding + 6;
+                lineasCond.forEach((l) => {
+                    doc.setFont('helvetica', l.bold ? 'bold' : 'normal');
+                    doc.text(l.texto, marginX + condPadding + l.indent, ly);
+                    ly += lineHeight;
+                });
+                y += condHeight + 20;
+
+                // Firmas
+                checkSpace(90);
+                const colW = contentWidth / 2;
+                const firmaLineY = y + 45;
+                doc.setDrawColor(51, 51, 51);
+                doc.setLineWidth(1);
+                doc.line(marginX + 20, firmaLineY, marginX + colW - 20, firmaLineY);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.text('Firma del Cliente', marginX + colW / 2, firmaLineY + 12, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.text('DNI: _________________', marginX + colW / 2, firmaLineY + 24, { align: 'center' });
+
+                const col2CenterX = marginX + colW + colW / 2;
+                if (firmaImg) {
+                    const fH = 40;
+                    const fW = fH * (firmaImg.w / firmaImg.h);
+                    doc.addImage(firmaImg.dataUrl, 'PNG', col2CenterX - fW / 2, firmaLineY - fH - 2, fW, fH);
+                }
+                doc.line(marginX + colW + 20, firmaLineY, marginX + contentWidth - 20, firmaLineY);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.text('Firma de la Organizadora', col2CenterX, firmaLineY + 12, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.text('DNI: 400-999-78', col2CenterX, firmaLineY + 24, { align: 'center' });
+                y = firmaLineY + 40;
+
+                // Footer
+                checkSpace(30);
+                doc.setDrawColor(221, 221, 221);
+                doc.setLineWidth(1);
+                doc.line(marginX, y, marginX + contentWidth, y);
+                y += 14;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(102, 102, 102);
+                doc.text('MOTOTOUR — Moto Tribu', pageWidth / 2, y, { align: 'center' });
+                y += 12;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.text('Para consultas adicionales o condiciones completas del servicio, contactar a la organizadora.', pageWidth / 2, y, { align: 'center' });
+
+                doc.save('Recibo_MOTOTOUR_MotoTribu.pdf');
+            } catch (err) {
+                console.error('Error generando el PDF', err);
+                alert('Ocurrió un error al generar el PDF. Intentá nuevamente.');
+            } finally {
+                boton.disabled = false;
+                boton.textContent = textoOriginal;
+            }
+        }
+
         function descargarWord() {
             const recibo = document.getElementById('recibo').cloneNode(true);
             
