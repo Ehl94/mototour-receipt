@@ -2,6 +2,7 @@
 .DS_Store
 Thumbs.db
 
-# Excluir todas las imágenes excepto el logo
+# Excluir archivos temporales de imágenes, no las usadas por el recibo
 assets/img/*
 !assets/img/logo.png
+!assets/img/firma.png
