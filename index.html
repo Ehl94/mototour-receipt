@@ -948,10 +948,11 @@
                 const GRIS = [120, 120, 120];
                 const GRIS_CLARO = [235, 235, 235];
                 const GRIS_BORDE = [190, 190, 190];
+                const NEGRO_SUAVE = [25, 25, 25];
 
                 const seccionTitulo = (texto) => {
                     checkSpace(26);
-                    doc.setFillColor(...GRIS);
+                    doc.setFillColor(...NEGRO_SUAVE);
                     doc.rect(marginX, y, contentWidth, 18, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFont('helvetica', 'bold');
