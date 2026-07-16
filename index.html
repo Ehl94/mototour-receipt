@@ -933,7 +933,7 @@
 
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const marginX = 40;
+                const marginX = 65;
                 const marginBottom = 40;
                 const contentWidth = pageWidth - marginX * 2;
                 let y = 40;
@@ -1065,9 +1065,10 @@
                 campo('Tipo de habitación:', valorCampo('tour_habitacion'));
                 campo('Tipo de moto:', valorCampo('tour_moto'));
                 campo('Servicios incluidos:', valorCampo('tour_servicios'));
-                y += 4;
 
-                // Resumen de pago
+                // Resumen de pago: siempre en una página nueva
+                doc.addPage();
+                y = 40;
                 seccionTitulo('RESUMEN DE PAGO');
                 const filaSaldo = ['SALDO PENDIENTE', '$ ' + valorCampo('pago_saldo')];
                 doc.autoTable({
