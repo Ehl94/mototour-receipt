@@ -1274,11 +1274,12 @@
                 doc.setTextColor(0, 0, 0);
                 y = firmaLineY + 40;
 
-                // Footer
-                checkSpace(30);
+                // Footer: siempre pegado al final de la página (con margen de seguridad
+                // por si el contenido de arriba llegara a ocupar más de lo habitual)
+                const footerY = Math.max(pageHeight - 34, y + 20);
                 doc.setFillColor(...FOOTER_LINEA);
-                doc.rect(0, y, pageWidth, 1.5, 'F');
-                y += 16;
+                doc.rect(0, footerY, pageWidth, 1.5, 'F');
+                y = footerY + 16;
                 doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(8.5);
                 doc.setTextColor(...GRIS_TEXTO);
