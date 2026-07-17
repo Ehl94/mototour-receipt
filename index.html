@@ -986,6 +986,7 @@
                 // Paleta tomada del diseño de referencia (oklch aproximado a sRGB)
                 const CREMA = [245, 241, 239];
                 const NEGRO = [30, 30, 30];
+                const NEGRO_CLARO = [58, 58, 58];
                 const TITULO_OSCURO = [29, 29, 29];
                 const ROJO = [211, 47, 47];
                 const ROJO_CLARO = [235, 90, 74];
@@ -1190,9 +1191,9 @@
                     body: filasPago,
                     didParseCell: (data) => {
                         if (data.row.index === filasPago.length - 1) {
-                            data.cell.styles.fillColor = NEGRO;
+                            data.cell.styles.fillColor = NEGRO_CLARO;
                             data.cell.styles.lineWidth = { top: 0, right: 0, bottom: 0, left: 0 };
-                            data.cell.styles.cellPadding = { top: 11, bottom: 11, left: PAD, right: PAD };
+                            data.cell.styles.cellPadding = { top: 16, bottom: 16, left: PAD, right: PAD };
                             data.cell.styles.fontSize = 10.5;
                             data.cell.styles.fontStyle = 'bold';
                             data.cell.styles.textColor = data.column.index === 0 ? [255, 255, 255] : ROJO_CLARO;
