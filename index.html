@@ -933,59 +933,83 @@
 
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const marginX = 75;
-                const marginBottom = 40;
-                const contentWidth = pageWidth - marginX * 2;
-                let y = 40;
+                const PAD = 30;
+                const marginBottom = 30;
+                let y = 0;
 
                 const checkSpace = (needed) => {
                     if (y + needed > pageHeight - marginBottom) {
                         doc.addPage();
-                        y = 40;
+                        y = 0;
                     }
                 };
 
-                // Mismos colores que usa el HTML del recibo
-                const GRIS = [51, 51, 51];       // #333 (barras de sección, SALDO PENDIENTE)
-                const GRIS_CLARO = [249, 249, 249]; // #f9f9f9 (columna de etiquetas, condiciones)
-                const GRIS_BORDE = [221, 221, 221]; // #ddd (bordes de tabla)
+                // Paleta tomada del diseño de referencia (oklch aproximado a sRGB)
+                const CREMA = [245, 241, 239];
+                const NEGRO = [30, 30, 30];
+                const TITULO_OSCURO = [29, 29, 29];
+                const ROJO = [211, 47, 47];
+                const ROJO_CLARO = [235, 90, 74];
+                const AZUL = [41, 98, 189];
+                const GRIS_OPER = [213, 213, 213];
+                const FILA_CLARA = [247, 246, 244];
+                const BORDE_CLARO = [228, 227, 225];
+                const GRIS_TEXTO = [128, 126, 124];
+                const GRIS_BORDE2 = [179, 177, 175];
+                const FIRMA_LINEA = [107, 105, 103];
+                const COND_TEXTO = [87, 85, 83];
+                const FOOTER_LINEA = [211, 211, 211];
 
                 const seccionTitulo = (texto) => {
-                    checkSpace(26);
-                    doc.setFillColor(...GRIS);
-                    doc.rect(marginX, y, contentWidth, 18, 'F');
+                    checkSpace(24);
+                    doc.setFillColor(...NEGRO);
+                    doc.rect(0, y, pageWidth, 20, 'F');
+                    doc.setFillColor(...ROJO);
+                    doc.rect(PAD, y + 4.5, 3, 11, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(10);
-                    doc.text(texto, marginX + 8, y + 12.5);
+                    doc.setFontSize(9.5);
+                    doc.text(texto, PAD + 11, y + 13.5);
                     doc.setTextColor(0, 0, 0);
-                    y += 18 + 8;
+                    y += 20;
                 };
 
-                // Tabla de datos label/valor, centrada en cada celda, con tema gris
-                const tablaDatos = (filas) => {
+                // Tabla de filas label/valor a todo el ancho, franjas alternadas, alineada a la izquierda
+                const tablaFilas = (filas, colorFilas = {}) => {
                     doc.autoTable({
                         startY: y,
-                        margin: { left: marginX, right: marginX },
-                        theme: 'grid',
+                        margin: { left: 0, right: 0 },
+                        tableWidth: pageWidth,
+                        theme: 'plain',
                         styles: {
-                            fontSize: 9,
-                            cellPadding: 8,
-                            textColor: [0, 0, 0],
-                            lineColor: GRIS_BORDE,
-                            lineWidth: 0.75,
-                            halign: 'center',
+                            font: 'helvetica',
+                            fontSize: 9.5,
+                            cellPadding: { top: 9, bottom: 9, left: PAD, right: PAD },
+                            textColor: [40, 40, 40],
+                            lineColor: BORDE_CLARO,
+                            lineWidth: { top: 0, right: 0, bottom: 0.75, left: 0 },
+                            halign: 'left',
                             valign: 'middle'
                         },
                         columnStyles: {
-                            0: { fontStyle: 'bold', fillColor: GRIS_CLARO, textColor: GRIS, cellWidth: contentWidth * 0.4 }
+                            0: { fontStyle: 'bold', cellWidth: pageWidth / 3 },
+                            1: { cellWidth: pageWidth - pageWidth / 3 }
                         },
-                        body: filas
+                        alternateRowStyles: { fillColor: FILA_CLARA },
+                        body: filas,
+                        didParseCell: (data) => {
+                            if (data.row.index === filas.length - 1) {
+                                data.cell.styles.lineWidth = { top: 0, right: 0, bottom: 0, left: 0 };
+                            }
+                            if (data.column.index === 1 && colorFilas[data.row.index]) {
+                                data.cell.styles.textColor = colorFilas[data.row.index];
+                            }
+                        }
                     });
-                    y = doc.lastAutoTable.finalY + 14;
+                    y = doc.lastAutoTable.finalY;
                 };
 
-                // Logo + título
+                // Imágenes
                 let logoImg = null, firmaImg = null;
                 try {
                     [logoImg, firmaImg] = await Promise.all([
@@ -996,205 +1020,226 @@
                     console.warn('No se pudieron cargar las imágenes para el PDF', e);
                 }
 
+                // Header: banda crema, logo y título a la derecha
+                const HEADER_H = 76;
+                doc.setFillColor(...CREMA);
+                doc.rect(0, 0, pageWidth, HEADER_H, 'F');
                 if (logoImg) {
-                    const logoH = 90;
+                    const logoH = 56;
                     const logoW = logoH * (logoImg.w / logoImg.h);
-                    doc.addImage(logoImg.dataUrl, 'PNG', (pageWidth - logoW) / 2, y, logoW, logoH);
-                    y += logoH + 8;
+                    doc.addImage(logoImg.dataUrl, 'PNG', pageWidth - PAD - 175, (HEADER_H - logoH) / 2, logoW, logoH);
                 }
-
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(12);
-                const tituloTexto = 'COMPROBANTE DE RESERVA';
-                const tituloWidth = doc.getTextWidth(tituloTexto) + 24;
-                doc.setDrawColor(153, 153, 153);
-                doc.setFillColor(249, 249, 249);
-                doc.roundedRect((pageWidth - tituloWidth) / 2, y, tituloWidth, 22, 6, 6, 'FD');
-                doc.setTextColor(51, 51, 51);
-                doc.text(tituloTexto, pageWidth / 2, y + 14.5, { align: 'center' });
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(15);
+                doc.setTextColor(...TITULO_OSCURO);
+                doc.text('COMPROBANTE', pageWidth - PAD, 34, { align: 'right' });
+                doc.setTextColor(...ROJO);
+                doc.text('DE RESERVA', pageWidth - PAD, 52, { align: 'right' });
                 doc.setTextColor(0, 0, 0);
-                y += 22 + 10;
+                y = HEADER_H;
 
-                doc.setDrawColor(51, 51, 51);
-                doc.setLineWidth(1.5);
-                doc.line(marginX, y, marginX + contentWidth, y);
-                y += 18;
-
-                // N° de operación y fecha
-                doc.setFontSize(9);
+                // Barra gris: N° de operación / fecha
+                const OPER_H = 30;
+                doc.setFillColor(...GRIS_OPER);
+                doc.rect(0, y, pageWidth, OPER_H, 'F');
+                const midY = y + 19;
+                let ox = PAD;
                 doc.setFont('helvetica', 'bold');
-                const numOperTxt = `N° DE OPERACIÓN: `;
+                doc.setFontSize(8);
+                doc.setTextColor(...GRIS_TEXTO);
+                doc.text('N° DE OPERACIÓN', ox, midY);
+                ox += doc.getTextWidth('N° DE OPERACIÓN') + 10;
                 const numOperVal = valorCampo('recibo_num') || '0000';
-                const fechaTxt = `Fecha: `;
+                doc.setFontSize(10);
+                const valW = doc.getTextWidth(numOperVal) + 16;
+                doc.setDrawColor(...GRIS_BORDE2);
+                doc.setFillColor(255, 255, 255);
+                doc.rect(ox, midY - 10, valW, 16, 'FD');
+                doc.setTextColor(...TITULO_OSCURO);
+                doc.text(numOperVal, ox + 8, midY + 1);
+                ox += valW + 14;
+                doc.setTextColor(...GRIS_BORDE2);
+                doc.setFont('helvetica', 'normal');
+                doc.text('|', ox, midY + 1);
+                ox += 14;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(...GRIS_TEXTO);
+                doc.text('FECHA', ox, midY);
+                ox += doc.getTextWidth('FECHA') + 10;
                 const fechaVal = valorCampo('fecha_emision') || 'dd/mm/aaaa';
-                const bloque1 = numOperTxt + numOperVal;
-                const bloque2 = fechaTxt + fechaVal;
                 doc.setFont('helvetica', 'bold');
-                const w1 = doc.getTextWidth(numOperTxt);
-                const w1v = doc.getTextWidth(numOperVal);
-                const w2 = doc.getTextWidth(fechaTxt);
-                const w2v = doc.getTextWidth(fechaVal);
-                doc.setFont('helvetica', 'normal');
-                const gap = 30;
-                const totalW = w1 + w1v + gap + w2 + w2v;
-                let cx = (pageWidth - totalW) / 2;
-                doc.setFont('helvetica', 'bold');
-                doc.text(numOperTxt, cx, y);
-                cx += w1;
-                doc.setFont('helvetica', 'normal');
-                doc.text(numOperVal, cx, y);
-                cx += w1v + gap;
-                doc.setFont('helvetica', 'bold');
-                doc.text(fechaTxt, cx, y);
-                cx += w2;
-                doc.setFont('helvetica', 'normal');
-                doc.text(fechaVal, cx, y);
-                y += 20;
+                doc.setFontSize(10);
+                doc.setTextColor(...TITULO_OSCURO);
+                doc.text(fechaVal, ox, midY + 1);
+                doc.setTextColor(0, 0, 0);
+                y += OPER_H;
+
+                // Línea roja
+                doc.setFillColor(...ROJO);
+                doc.rect(0, y, pageWidth, 2.5, 'F');
+                y += 2.5 + 12;
 
                 // Datos de la organizadora
                 seccionTitulo('DATOS DE LA ORGANIZADORA');
-                tablaDatos([
-                    ['Nombre / Razón Social:', valorCampo('org_nombre')],
-                    ['CUIT / CUIL:', valorCampo('org_cuit')],
-                    ['Domicilio:', valorCampo('org_domicilio')],
-                    ['Teléfono / WhatsApp:', valorCampo('org_telefono')]
-                ]);
+                tablaFilas([
+                    ['Nombre / Razón Social', valorCampo('org_nombre')],
+                    ['CUIT / CUIL', valorCampo('org_cuit')],
+                    ['Domicilio', valorCampo('org_domicilio')],
+                    ['Teléfono / WhatsApp', valorCampo('org_telefono')]
+                ], { 3: AZUL });
 
                 // Datos del cliente
                 seccionTitulo('DATOS DEL CLIENTE / RESERVANTE');
-                tablaDatos([
-                    ['Nombre y Apellido:', valorCampo('cli_nombre')],
-                    ['DNI / Pasaporte:', valorCampo('cli_dni')],
-                    ['Domicilio:', valorCampo('cli_domicilio')],
-                    ['Teléfono / Celular:', valorCampo('cli_telefono')]
+                tablaFilas([
+                    ['Nombre y Apellido', valorCampo('cli_nombre')],
+                    ['DNI / Pasaporte', valorCampo('cli_dni')],
+                    ['Domicilio', valorCampo('cli_domicilio')],
+                    ['Teléfono / Celular', valorCampo('cli_telefono')]
                 ]);
 
                 // Detalles de la reserva
                 seccionTitulo('DETALLES DE LA RESERVA');
-                tablaDatos([
-                    ['Tour:', valorCampo('tour_nombre')],
-                    ['Fecha del Tour:', valorCampo('tour_fecha')],
-                    ['Hora de encuentro:', valorCampo('tour_hora')],
-                    ['Duración:', valorCampo('tour_duracion')],
-                    ['Cantidad de personas:', valorCampo('tour_personas')],
-                    ['Tipo de habitación:', valorCampo('tour_habitacion')],
-                    ['Tipo de moto:', valorCampo('tour_moto')],
-                    ['Servicios incluidos:', valorCampo('tour_servicios')]
-                ]);
+                tablaFilas([
+                    ['Tour', valorCampo('tour_nombre')],
+                    ['Duración', valorCampo('tour_duracion')],
+                    ['Fecha del Tour', valorCampo('tour_fecha')],
+                    ['Hora de Encuentro', valorCampo('tour_hora')],
+                    ['Cantidad de Personas', valorCampo('tour_personas')],
+                    ['Tipo de Habitación', valorCampo('tour_habitacion')],
+                    ['Tipo de Moto', valorCampo('tour_moto')],
+                    ['Servicios Incluidos', valorCampo('tour_servicios')]
+                ], { 0: AZUL });
 
                 // Resumen de pago: siempre en una página nueva
                 doc.addPage();
-                y = 40;
+                y = 0;
                 seccionTitulo('RESUMEN DE PAGO');
-                const filaSaldo = ['SALDO PENDIENTE', '$ ' + valorCampo('pago_saldo')];
+                const filasPago = [
+                    ['Precio por Persona', '$ ' + valorCampo('pago_precio')],
+                    ['Cantidad de Personas', valorCampo('pago_cantidad')],
+                    ['Subtotal', '$ ' + valorCampo('pago_subtotal')],
+                    ['Seña / Anticipo Abonado', '$ ' + valorCampo('pago_sena')],
+                    ['Fecha de Pago de Seña', valorCampo('pago_fecha_sena')],
+                    ['Método de Pago', valorCampo('pago_metodo')],
+                    ['SALDO PENDIENTE', '$ ' + valorCampo('pago_saldo')]
+                ];
                 doc.autoTable({
                     startY: y,
-                    margin: { left: marginX, right: marginX },
-                    theme: 'grid',
-                    styles: { fontSize: 9, cellPadding: 9, textColor: [0, 0, 0], lineColor: GRIS_BORDE, lineWidth: 0.75, halign: 'left', valign: 'middle' },
-                    columnStyles: {
-                        0: { fontStyle: 'bold', fillColor: GRIS_CLARO, textColor: GRIS, cellWidth: contentWidth * 0.45 }
+                    margin: { left: 0, right: 0 },
+                    tableWidth: pageWidth,
+                    theme: 'plain',
+                    styles: {
+                        font: 'helvetica',
+                        fontSize: 9.5,
+                        cellPadding: { top: 9, bottom: 9, left: PAD, right: PAD },
+                        textColor: [40, 40, 40],
+                        lineColor: BORDE_CLARO,
+                        lineWidth: { top: 0, right: 0, bottom: 0.75, left: 0 },
+                        halign: 'left',
+                        valign: 'middle'
                     },
-                    body: [
-                        ['Precio por persona', '$ ' + valorCampo('pago_precio')],
-                        ['Cantidad de personas', valorCampo('pago_cantidad')],
-                        ['Subtotal', '$ ' + valorCampo('pago_subtotal')],
-                        ['Seña / Anticipo abonado', '$ ' + valorCampo('pago_sena')],
-                        ['Fecha de pago de seña', valorCampo('pago_fecha_sena')],
-                        ['Método de pago', valorCampo('pago_metodo')],
-                        filaSaldo
-                    ],
+                    columnStyles: {
+                        0: { fontStyle: 'bold', cellWidth: pageWidth / 3 },
+                        1: { cellWidth: pageWidth - pageWidth / 3 }
+                    },
+                    alternateRowStyles: { fillColor: FILA_CLARA },
+                    body: filasPago,
                     didParseCell: (data) => {
-                        if (data.row.raw === filaSaldo) {
-                            data.cell.styles.fillColor = GRIS;
-                            data.cell.styles.textColor = [255, 255, 255];
+                        if (data.row.index === filasPago.length - 1) {
+                            data.cell.styles.fillColor = NEGRO;
+                            data.cell.styles.lineWidth = { top: 0, right: 0, bottom: 0, left: 0 };
+                            data.cell.styles.cellPadding = { top: 11, bottom: 11, left: PAD, right: PAD };
+                            data.cell.styles.fontSize = 10.5;
                             data.cell.styles.fontStyle = 'bold';
-                            data.cell.styles.fontSize = 11;
+                            data.cell.styles.textColor = data.column.index === 0 ? [255, 255, 255] : ROJO_CLARO;
                         }
                     }
                 });
-                y = doc.lastAutoTable.finalY + 14;
+                y = doc.lastAutoTable.finalY;
 
-                // Condiciones generales
+                // Condiciones generales (lista simple, sin caja de color)
                 const condicionesItems = [
                     { texto: 'La reserva queda confirmada una vez abonada la seña establecida.', indent: 0 },
                     { texto: 'El saldo restante debe ser abonado antes del inicio del tour.', indent: 0 },
                     { texto: 'Cancelaciones:', indent: 0 },
-                    { texto: 'Con más de 30 días de anticipación: devolución del 90% de la seña.', indent: 14 },
-                    { texto: 'Entre 10 y 30 días de anticipación: devolución del 60% de la seña.', indent: 14 },
-                    { texto: 'Menos de 10 días de anticipación: sin devolución.', indent: 14 },
+                    { texto: 'Con más de 30 días de anticipación: devolución del 90% de la seña.', indent: 16 },
+                    { texto: 'Entre 10 y 30 días de anticipación: devolución del 60% de la seña.', indent: 16 },
+                    { texto: 'Menos de 10 días de anticipación: sin devolución.', indent: 16 },
                     { texto: 'La organizadora no se responsabiliza por daños ocasionados por mal uso de la motocicleta.', indent: 0 },
                     { texto: 'El cliente debe contar con licencia de conducir vigente.', indent: 0 },
                     { texto: 'Las condiciones climáticas pueden modificar el itinerario sin previo aviso.', indent: 0 }
                 ];
-                doc.setFontSize(8);
-                const condPadding = 8;
-                const lineHeight = 10.5;
-                let lineasCond = [{ texto: 'CONDICIONES GENERALES Y POLÍTICA DE CANCELACIÓN:', bold: true, indent: 0 }];
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                const condLineH = 13;
+                let lineasCond = [];
                 condicionesItems.forEach((item) => {
-                    doc.setFont('helvetica', 'normal');
-                    const wrapped = doc.splitTextToSize('•  ' + item.texto, contentWidth - condPadding * 2 - item.indent);
-                    wrapped.forEach((linea, idx) => {
-                        lineasCond.push({ texto: linea, bold: false, indent: item.indent });
-                    });
+                    const bullet = item.indent === 0 ? '•  ' : '-  ';
+                    const wrapped = doc.splitTextToSize(bullet + item.texto, pageWidth - PAD * 2 - item.indent);
+                    wrapped.forEach((linea) => lineasCond.push({ texto: linea, indent: item.indent }));
                 });
-                const condHeight = condPadding * 2 + lineasCond.length * lineHeight;
-                checkSpace(condHeight);
-                doc.setFillColor(249, 249, 249);
-                doc.rect(marginX, y, contentWidth, condHeight, 'F');
-                doc.setFillColor(211, 47, 47);
-                doc.rect(marginX, y, 3, condHeight, 'F');
-                let ly = y + condPadding + 6;
+                checkSpace(20 + 16 + lineasCond.length * condLineH + 16);
+                seccionTitulo('CONDICIONES GENERALES Y POLÍTICA DE CANCELACIÓN');
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(...COND_TEXTO);
+                let ly = y + 16;
                 lineasCond.forEach((l) => {
-                    doc.setFont('helvetica', l.bold ? 'bold' : 'normal');
-                    doc.text(l.texto, marginX + condPadding + l.indent, ly);
-                    ly += lineHeight;
+                    doc.text(l.texto, PAD + l.indent, ly);
+                    ly += condLineH;
                 });
-                y += condHeight + 20;
+                doc.setTextColor(0, 0, 0);
+                y = ly + 16;
 
                 // Firmas
-                checkSpace(190);
-                const colW = contentWidth / 2;
-                const firmaLineY = y + 130;
-                doc.setDrawColor(51, 51, 51);
+                checkSpace(160);
+                y += 34;
+                const colHalf = pageWidth / 2;
+                const firmaLineY = y + 90;
+                doc.setDrawColor(...FIRMA_LINEA);
                 doc.setLineWidth(1);
-                doc.line(marginX + 20, firmaLineY, marginX + colW - 20, firmaLineY);
+                doc.line(PAD, firmaLineY, colHalf - 20, firmaLineY);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.text('Firma del Cliente', marginX + colW / 2, firmaLineY + 14, { align: 'center' });
+                doc.setFontSize(9.5);
+                doc.setTextColor(...TITULO_OSCURO);
+                doc.text('Firma del Cliente', (PAD + colHalf - 20) / 2, firmaLineY + 14, { align: 'center' });
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-                doc.text('DNI: _________________', marginX + colW / 2, firmaLineY + 27, { align: 'center' });
+                doc.setFontSize(8.5);
+                doc.setTextColor(...GRIS_TEXTO);
+                doc.text('DNI: _________________', (PAD + colHalf - 20) / 2, firmaLineY + 27, { align: 'center' });
 
-                const col2CenterX = marginX + colW + colW / 2;
+                const col2Start = colHalf + 20;
+                const col2End = pageWidth - PAD;
+                const col2Center = (col2Start + col2End) / 2;
                 if (firmaImg) {
-                    const fH = 120;
+                    const fH = 95;
                     const fW = fH * (firmaImg.w / firmaImg.h);
-                    doc.addImage(firmaImg.dataUrl, 'PNG', col2CenterX - fW / 2, firmaLineY - fH - 2, fW, fH);
+                    doc.addImage(firmaImg.dataUrl, 'PNG', col2Center - fW / 2, firmaLineY - fH - 2, fW, fH);
                 }
-                doc.line(marginX + colW + 20, firmaLineY, marginX + contentWidth - 20, firmaLineY);
+                doc.setDrawColor(...FIRMA_LINEA);
+                doc.line(col2Start, firmaLineY, col2End, firmaLineY);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.text('Firma de la Organizadora', col2CenterX, firmaLineY + 14, { align: 'center' });
+                doc.setFontSize(9.5);
+                doc.setTextColor(...TITULO_OSCURO);
+                doc.text('Firma de la Organizadora', col2Center, firmaLineY + 14, { align: 'center' });
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-                doc.text('DNI: 400-999-78', col2CenterX, firmaLineY + 27, { align: 'center' });
-                y = firmaLineY + 45;
+                doc.setFontSize(8.5);
+                doc.setTextColor(...GRIS_TEXTO);
+                doc.text('DNI: 400-999-78', col2Center, firmaLineY + 27, { align: 'center' });
+                doc.setTextColor(0, 0, 0);
+                y = firmaLineY + 40;
 
                 // Footer
                 checkSpace(30);
-                doc.setDrawColor(221, 221, 221);
-                doc.setLineWidth(1);
-                doc.line(marginX, y, marginX + contentWidth, y);
-                y += 14;
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.setTextColor(102, 102, 102);
-                doc.text('MOTOTOUR — Moto Tribu', pageWidth / 2, y, { align: 'center' });
-                y += 12;
+                doc.setFillColor(...FOOTER_LINEA);
+                doc.rect(0, y, pageWidth, 1.5, 'F');
+                y += 16;
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
+                doc.setFontSize(8.5);
+                doc.setTextColor(...GRIS_TEXTO);
                 doc.text('Para consultas adicionales o condiciones completas del servicio, contactar a la organizadora.', pageWidth / 2, y, { align: 'center' });
+                doc.setTextColor(0, 0, 0);
 
                 doc.save('Recibo_MOTOTOUR_MotoTribu.pdf');
             } catch (err) {
