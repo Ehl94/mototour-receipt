@@ -920,6 +920,20 @@
             });
         }
 
+        // Precarga el logo y la firma apenas carga la página. Cargarlos recién al hacer
+        // clic introduce una espera asincrónica real (Image.onload) entre el gesto del
+        // usuario y doc.save(); Safari/iOS puede bloquear en silencio la descarga si no
+        // ocurre de forma síncrona dentro del mismo gesto. Precargando, al momento del
+        // clic solo queda un await sobre una promesa ya resuelta (microtask, no rompe
+        // la activación del usuario).
+        const imagenesListas = Promise.all([
+            cargarImagen('./assets/img/logo.png'),
+            cargarImagen('./assets/img/firma.png')
+        ]).then(([logo, firma]) => ({ logo, firma })).catch((e) => {
+            console.warn('No se pudieron precargar las imágenes para el PDF', e);
+            return { logo: null, firma: null };
+        });
+
         // Genera el PDF directamente (sin pasar por el diálogo de impresión del navegador)
         async function generarPDF() {
             const boton = document.getElementById('btn-pdf');
@@ -1009,16 +1023,8 @@
                     y = doc.lastAutoTable.finalY;
                 };
 
-                // Imágenes
-                let logoImg = null, firmaImg = null;
-                try {
-                    [logoImg, firmaImg] = await Promise.all([
-                        cargarImagen('./assets/img/logo.png'),
-                        cargarImagen('./assets/img/firma.png')
-                    ]);
-                } catch (e) {
-                    console.warn('No se pudieron cargar las imágenes para el PDF', e);
-                }
+                // Imágenes (ya precargadas al entrar a la página)
+                const { logo: logoImg, firma: firmaImg } = await imagenesListas;
 
                 // Header: banda crema, logo y título a la derecha
                 const HEADER_H = 76;
