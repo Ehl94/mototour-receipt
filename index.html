@@ -1065,20 +1065,20 @@
                 }
 
                 // Header: banda crema, logo y título a la derecha
-                const HEADER_H = 92;
+                const HEADER_H = 108;
                 doc.setFillColor(...CREMA);
                 doc.rect(0, 0, pageWidth, HEADER_H, 'F');
                 if (logoImg) {
-                    const logoH = 78.4; // 56 + 40%
+                    const logoH = 94.08; // 78.4 + 20%
                     const logoW = logoH * (logoImg.w / logoImg.h);
                     doc.addImage(logoImg.dataUrl, 'PNG', (pageWidth - logoW) / 2, (HEADER_H - logoH) / 2, logoW, logoH);
                 }
                 doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(15);
                 doc.setTextColor(...TITULO_OSCURO);
-                doc.text('COMPROBANTE', pageWidth - PAD, 42, { align: 'right' });
+                doc.text('COMPROBANTE', pageWidth - PAD, 50, { align: 'right' });
                 doc.setTextColor(...ROJO);
-                doc.text('DE RESERVA', pageWidth - PAD, 60, { align: 'right' });
+                doc.text('DE RESERVA', pageWidth - PAD, 68, { align: 'right' });
                 doc.setTextColor(0, 0, 0);
                 y = HEADER_H;
 
