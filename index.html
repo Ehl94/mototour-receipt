@@ -942,6 +942,9 @@
             boton.textContent = '⏳ Generando...';
 
             try {
+                if (!window.jspdf || !window.jspdf.jsPDF) {
+                    throw new Error('No se pudo cargar la librería jsPDF (revisá tu conexión a internet e intentá de nuevo).');
+                }
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ unit: 'pt', format: 'letter' });
 
@@ -1247,10 +1250,25 @@
                 doc.text('Para consultas adicionales o condiciones completas del servicio, contactar a la organizadora.', pageWidth / 2, y, { align: 'center' });
                 doc.setTextColor(0, 0, 0);
 
-                doc.save('Recibo_MOTOTOUR_MotoTribu.pdf');
+                const nombreArchivo = 'Recibo_MOTOTOUR_MotoTribu.pdf';
+                const esIOS = /iP(hone|od|ad)/.test(navigator.userAgent) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+                if (esIOS) {
+                    // En iOS/Safari el truco de <a download> para blobs suele fallar en
+                    // silencio. Abrimos el PDF en una pestaña nueva con el visor nativo,
+                    // desde donde el usuario puede usar "Compartir" para guardarlo.
+                    const blobUrl = URL.createObjectURL(doc.output('blob'));
+                    const ventana = window.open(blobUrl, '_blank');
+                    if (!ventana) {
+                        alert('El navegador bloqueó la ventana del PDF. Habilitá las ventanas emergentes para este sitio e intentá de nuevo.');
+                    }
+                } else {
+                    doc.save(nombreArchivo);
+                }
             } catch (err) {
                 console.error('Error generando el PDF', err);
-                alert('Ocurrió un error al generar el PDF. Intentá nuevamente.');
+                alert('Ocurrió un error al generar el PDF: ' + (err && err.message ? err.message : err));
             } finally {
                 boton.disabled = false;
                 boton.textContent = textoOriginal;
