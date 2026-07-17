@@ -920,18 +920,40 @@
             });
         }
 
-        // Precarga el logo y la firma apenas carga la página. Cargarlos recién al hacer
-        // clic introduce una espera asincrónica real (Image.onload) entre el gesto del
-        // usuario y doc.save(); Safari/iOS puede bloquear en silencio la descarga si no
-        // ocurre de forma síncrona dentro del mismo gesto. Precargando, al momento del
-        // clic solo queda un await sobre una promesa ya resuelta (microtask, no rompe
-        // la activación del usuario).
+        // Carga un archivo de fuente TTF local y lo devuelve en base64 (formato que
+        // espera jsPDF para addFileToVFS).
+        async function cargarFuenteBase64(url) {
+            const resp = await fetch(url);
+            const buffer = await resp.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+            let binario = '';
+            const chunk = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunk) {
+                binario += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+            }
+            return btoa(binario);
+        }
+
+        // Precarga el logo, la firma y la tipografía Barlow apenas carga la página.
+        // Cargarlos recién al hacer clic introduce una espera asincrónica real entre el
+        // gesto del usuario y doc.save()/window.open(); Safari/iOS puede bloquear en
+        // silencio la descarga si no ocurre de forma síncrona dentro del mismo gesto.
+        // Precargando, al momento del clic solo queda un await sobre promesas ya
+        // resueltas (microtask, no rompe la activación del usuario).
         const imagenesListas = Promise.all([
             cargarImagen('./assets/img/logo.png'),
             cargarImagen('./assets/img/firma.png')
         ]).then(([logo, firma]) => ({ logo, firma })).catch((e) => {
             console.warn('No se pudieron precargar las imágenes para el PDF', e);
             return { logo: null, firma: null };
+        });
+
+        const fuentesListas = Promise.all([
+            cargarFuenteBase64('./assets/fonts/Barlow-Regular.ttf'),
+            cargarFuenteBase64('./assets/fonts/Barlow-Bold.ttf')
+        ]).then(([regular, bold]) => ({ regular, bold })).catch((e) => {
+            console.warn('No se pudo cargar la tipografía Barlow, se usará Helvetica', e);
+            return { regular: null, bold: null };
         });
 
         // Genera el PDF directamente (sin pasar por el diálogo de impresión del navegador)
@@ -984,7 +1006,7 @@
                     doc.setFillColor(...ROJO);
                     doc.rect(PAD, y + 4.5, 3, 11, 'F');
                     doc.setTextColor(255, 255, 255);
-                    doc.setFont('helvetica', 'bold');
+                    doc.setFont(FUENTE, 'bold');
                     doc.setFontSize(9.5);
                     doc.text(texto, PAD + 11, y + 13.5);
                     doc.setTextColor(0, 0, 0);
@@ -999,9 +1021,9 @@
                         tableWidth: pageWidth,
                         theme: 'plain',
                         styles: {
-                            font: 'helvetica',
+                            font: FUENTE,
                             fontSize: 9.5,
-                            cellPadding: { top: 9, bottom: 9, left: PAD, right: PAD },
+                            cellPadding: { top: 11, bottom: 11, left: PAD, right: PAD },
                             textColor: [40, 40, 40],
                             lineColor: BORDE_CLARO,
                             lineWidth: { top: 0, right: 0, bottom: 0.75, left: 0 },
@@ -1029,6 +1051,18 @@
                 // Imágenes (ya precargadas al entrar a la página)
                 const { logo: logoImg, firma: firmaImg } = await imagenesListas;
 
+                // Tipografía Barlow (la misma del diseño de referencia). Si por algún
+                // motivo no se pudo precargar, se sigue usando Helvetica como respaldo.
+                const { regular: barlowRegular, bold: barlowBold } = await fuentesListas;
+                let FUENTE = 'helvetica';
+                if (barlowRegular && barlowBold) {
+                    doc.addFileToVFS('Barlow-Regular.ttf', barlowRegular);
+                    doc.addFont('Barlow-Regular.ttf', 'Barlow', 'normal');
+                    doc.addFileToVFS('Barlow-Bold.ttf', barlowBold);
+                    doc.addFont('Barlow-Bold.ttf', 'Barlow', 'bold');
+                    FUENTE = 'Barlow';
+                }
+
                 // Header: banda crema, logo y título a la derecha
                 const HEADER_H = 76;
                 doc.setFillColor(...CREMA);
@@ -1036,9 +1070,9 @@
                 if (logoImg) {
                     const logoH = 56;
                     const logoW = logoH * (logoImg.w / logoImg.h);
-                    doc.addImage(logoImg.dataUrl, 'PNG', pageWidth - PAD - 175, (HEADER_H - logoH) / 2, logoW, logoH);
+                    doc.addImage(logoImg.dataUrl, 'PNG', (pageWidth - logoW) / 2, (HEADER_H - logoH) / 2, logoW, logoH);
                 }
-                doc.setFont('helvetica', 'bold');
+                doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(15);
                 doc.setTextColor(...TITULO_OSCURO);
                 doc.text('COMPROBANTE', pageWidth - PAD, 34, { align: 'right' });
@@ -1053,7 +1087,7 @@
                 doc.rect(0, y, pageWidth, OPER_H, 'F');
                 const midY = y + 19;
                 let ox = PAD;
-                doc.setFont('helvetica', 'bold');
+                doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(8);
                 doc.setTextColor(...GRIS_TEXTO);
                 doc.text('N° DE OPERACIÓN', ox, midY);
@@ -1068,16 +1102,16 @@
                 doc.text(numOperVal, ox + 8, midY + 1);
                 ox += valW + 14;
                 doc.setTextColor(...GRIS_BORDE2);
-                doc.setFont('helvetica', 'normal');
+                doc.setFont(FUENTE, 'normal');
                 doc.text('|', ox, midY + 1);
                 ox += 14;
-                doc.setFont('helvetica', 'bold');
+                doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(8);
                 doc.setTextColor(...GRIS_TEXTO);
                 doc.text('FECHA', ox, midY);
                 ox += doc.getTextWidth('FECHA') + 10;
                 const fechaVal = valorCampo('fecha_emision') || 'dd/mm/aaaa';
-                doc.setFont('helvetica', 'bold');
+                doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(10);
                 doc.setTextColor(...TITULO_OSCURO);
                 doc.text(fechaVal, ox, midY + 1);
@@ -1139,9 +1173,9 @@
                     tableWidth: pageWidth,
                     theme: 'plain',
                     styles: {
-                        font: 'helvetica',
+                        font: FUENTE,
                         fontSize: 9.5,
-                        cellPadding: { top: 9, bottom: 9, left: PAD, right: PAD },
+                        cellPadding: { top: 11, bottom: 11, left: PAD, right: PAD },
                         textColor: [40, 40, 40],
                         lineColor: BORDE_CLARO,
                         lineWidth: { top: 0, right: 0, bottom: 0.75, left: 0 },
@@ -1179,7 +1213,7 @@
                     { texto: 'El cliente debe contar con licencia de conducir vigente.', indent: 0 },
                     { texto: 'Las condiciones climáticas pueden modificar el itinerario sin previo aviso.', indent: 0 }
                 ];
-                doc.setFont('helvetica', 'normal');
+                doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(9);
                 const condLineH = 13;
                 let lineasCond = [];
@@ -1190,7 +1224,7 @@
                 });
                 checkSpace(20 + 16 + lineasCond.length * condLineH + 16);
                 seccionTitulo('CONDICIONES GENERALES Y POLÍTICA DE CANCELACIÓN');
-                doc.setFont('helvetica', 'normal');
+                doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(9);
                 doc.setTextColor(...COND_TEXTO);
                 let ly = y + 16;
@@ -1209,11 +1243,11 @@
                 doc.setDrawColor(...FIRMA_LINEA);
                 doc.setLineWidth(1);
                 doc.line(PAD, firmaLineY, colHalf - 20, firmaLineY);
-                doc.setFont('helvetica', 'bold');
+                doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(9.5);
                 doc.setTextColor(...TITULO_OSCURO);
                 doc.text('Firma del Cliente', (PAD + colHalf - 20) / 2, firmaLineY + 14, { align: 'center' });
-                doc.setFont('helvetica', 'normal');
+                doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(8.5);
                 doc.setTextColor(...GRIS_TEXTO);
                 doc.text('DNI: _________________', (PAD + colHalf - 20) / 2, firmaLineY + 27, { align: 'center' });
@@ -1228,11 +1262,11 @@
                 }
                 doc.setDrawColor(...FIRMA_LINEA);
                 doc.line(col2Start, firmaLineY, col2End, firmaLineY);
-                doc.setFont('helvetica', 'bold');
+                doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(9.5);
                 doc.setTextColor(...TITULO_OSCURO);
                 doc.text('Firma de la Organizadora', col2Center, firmaLineY + 14, { align: 'center' });
-                doc.setFont('helvetica', 'normal');
+                doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(8.5);
                 doc.setTextColor(...GRIS_TEXTO);
                 doc.text('DNI: 400-999-78', col2Center, firmaLineY + 27, { align: 'center' });
@@ -1244,7 +1278,7 @@
                 doc.setFillColor(...FOOTER_LINEA);
                 doc.rect(0, y, pageWidth, 1.5, 'F');
                 y += 16;
-                doc.setFont('helvetica', 'normal');
+                doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(8.5);
                 doc.setTextColor(...GRIS_TEXTO);
                 doc.text('Para consultas adicionales o condiciones completas del servicio, contactar a la organizadora.', pageWidth / 2, y, { align: 'center' });
