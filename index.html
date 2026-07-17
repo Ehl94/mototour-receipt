@@ -1176,7 +1176,7 @@
                     styles: {
                         font: FUENTE,
                         fontSize: 9.5,
-                        cellPadding: { top: 11, bottom: 11, left: PAD, right: PAD },
+                        cellPadding: { top: 14, bottom: 14, left: PAD, right: PAD },
                         textColor: [40, 40, 40],
                         lineColor: BORDE_CLARO,
                         lineWidth: { top: 0, right: 0, bottom: 0.75, left: 0 },
@@ -1216,7 +1216,7 @@
                 ];
                 doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(9);
-                const condLineH = 13;
+                const condLineH = 15;
                 let lineasCond = [];
                 condicionesItems.forEach((item) => {
                     const bullet = item.indent === 0 ? '•  ' : '-  ';
@@ -1238,7 +1238,7 @@
 
                 // Firmas
                 checkSpace(160);
-                y += 34;
+                y += 70;
                 const colHalf = pageWidth / 2;
                 const firmaLineY = y + 90;
                 doc.setDrawColor(...FIRMA_LINEA);
