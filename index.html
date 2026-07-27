@@ -904,6 +904,12 @@
             return el.value || '';
         }
 
+        // Formatea un campo de dinero con signo "$" y moneda "USD" fija
+        function montoUSD(id) {
+            const valor = valorCampo(id);
+            return valor ? `$ ${valor} USD` : '';
+        }
+
         // Carga una imagen local como dataURL (necesario para incrustarla en el PDF)
         function cargarImagen(src) {
             return new Promise((resolve, reject) => {
@@ -1160,13 +1166,13 @@
                 y = 0;
                 seccionTitulo('RESUMEN DE PAGO');
                 const filasPago = [
-                    ['Precio por Persona', '$ ' + valorCampo('pago_precio')],
+                    ['Precio por Persona', montoUSD('pago_precio')],
                     ['Cantidad de Personas', valorCampo('pago_cantidad')],
-                    ['Subtotal', '$ ' + valorCampo('pago_subtotal')],
-                    ['Seña / Anticipo Abonado', '$ ' + valorCampo('pago_sena')],
+                    ['Subtotal', montoUSD('pago_subtotal')],
+                    ['Seña / Anticipo Abonado', montoUSD('pago_sena')],
                     ['Fecha de Pago de Seña', valorCampo('pago_fecha_sena')],
                     ['Método de Pago', valorCampo('pago_metodo')],
-                    ['SALDO PENDIENTE', '$ ' + valorCampo('pago_saldo')]
+                    ['SALDO PENDIENTE', montoUSD('pago_saldo')]
                 ];
                 doc.autoTable({
                     startY: y,
