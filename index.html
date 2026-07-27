@@ -809,6 +809,15 @@
             <div class="seccion-titulo">RESUMEN DE PAGO</div>
             <table class="tabla-resumen">
                 <tr>
+                    <td>Moneda</td>
+                    <td>
+                        <select id="pago_moneda">
+                            <option value="ARS">ARS - Peso argentino</option>
+                            <option value="USD" selected>USD - Dólar</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td>Precio por persona</td>
                     <td>$ <input type="text" inputmode="decimal" id="pago_precio"></td>
                 </tr>
@@ -904,10 +913,12 @@
             return el.value || '';
         }
 
-        // Formatea un campo de dinero con signo "$" y moneda "USD" fija
+        // Formatea un campo de dinero con signo "$" y la moneda elegida en el selector
         function montoUSD(id) {
             const valor = valorCampo(id);
-            return valor ? `$ ${valor} USD` : '';
+            const selectMoneda = document.getElementById('pago_moneda');
+            const moneda = (selectMoneda && selectMoneda.value) || 'USD';
+            return valor ? `$ ${valor} ${moneda}` : '';
         }
 
         // Carga una imagen local como dataURL (necesario para incrustarla en el PDF)
