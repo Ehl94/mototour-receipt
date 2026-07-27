@@ -972,7 +972,14 @@
 
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                const PAD = 40;
+                // Margen real de página: las impresoras no pueden imprimir a sangre
+                // (borde a borde), así que todo el contenido —incluidas las barras de
+                // color— se mantiene adentro de este margen en vez de tocar el borde.
+                const MARGIN_PAGE = 40;
+                const PAD = 14; // padding interno del texto dentro de barras/filas
+                const contentX = MARGIN_PAGE;
+                const contentRight = pageWidth - MARGIN_PAGE;
+                const contentW = contentRight - contentX;
                 const marginBottom = 30;
                 let y = 0;
 
@@ -1003,13 +1010,13 @@
                 const seccionTitulo = (texto) => {
                     checkSpace(24);
                     doc.setFillColor(...NEGRO);
-                    doc.rect(0, y, pageWidth, 20, 'F');
+                    doc.rect(contentX, y, contentW, 20, 'F');
                     doc.setFillColor(...ROJO);
-                    doc.rect(PAD, y + 4.5, 3, 11, 'F');
+                    doc.rect(contentX + PAD, y + 4.5, 3, 11, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFont(FUENTE, 'bold');
                     doc.setFontSize(9.5);
-                    doc.text(texto, PAD + 11, y + 13.5);
+                    doc.text(texto, contentX + PAD + 11, y + 13.5);
                     doc.setTextColor(0, 0, 0);
                     y += 20;
                 };
@@ -1018,8 +1025,8 @@
                 const tablaFilas = (filas, colorFilas = {}) => {
                     doc.autoTable({
                         startY: y,
-                        margin: { left: 0, right: 0 },
-                        tableWidth: pageWidth,
+                        margin: { left: MARGIN_PAGE, right: MARGIN_PAGE },
+                        tableWidth: contentW,
                         theme: 'plain',
                         styles: {
                             font: FUENTE,
@@ -1032,8 +1039,8 @@
                             valign: 'middle'
                         },
                         columnStyles: {
-                            0: { fontStyle: 'bold', cellWidth: pageWidth / 3 },
-                            1: { cellWidth: pageWidth - pageWidth / 3 }
+                            0: { fontStyle: 'bold', cellWidth: contentW / 3 },
+                            1: { cellWidth: contentW - contentW / 3 }
                         },
                         alternateRowStyles: { fillColor: FILA_CLARA },
                         body: filas,
@@ -1067,7 +1074,7 @@
                 // Header: banda crema, logo y título a la derecha
                 const HEADER_H = 108;
                 doc.setFillColor(...CREMA);
-                doc.rect(0, 0, pageWidth, HEADER_H, 'F');
+                doc.rect(contentX, 0, contentW, HEADER_H, 'F');
                 if (logoImg) {
                     const logoH = 94.08; // 78.4 + 20%
                     const logoW = logoH * (logoImg.w / logoImg.h);
@@ -1076,18 +1083,18 @@
                 doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(15);
                 doc.setTextColor(...TITULO_OSCURO);
-                doc.text('COMPROBANTE', pageWidth - PAD, 50, { align: 'right' });
+                doc.text('COMPROBANTE', contentRight, 50, { align: 'right' });
                 doc.setTextColor(...ROJO);
-                doc.text('DE RESERVA', pageWidth - PAD, 68, { align: 'right' });
+                doc.text('DE RESERVA', contentRight, 68, { align: 'right' });
                 doc.setTextColor(0, 0, 0);
                 y = HEADER_H;
 
                 // Barra gris: N° de operación / fecha
                 const OPER_H = 30;
                 doc.setFillColor(...GRIS_OPER);
-                doc.rect(0, y, pageWidth, OPER_H, 'F');
+                doc.rect(contentX, y, contentW, OPER_H, 'F');
                 const midY = y + 19;
-                let ox = PAD;
+                let ox = contentX + PAD;
                 doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(8);
                 doc.setTextColor(...GRIS_TEXTO);
@@ -1121,7 +1128,7 @@
 
                 // Línea roja
                 doc.setFillColor(...ROJO);
-                doc.rect(0, y, pageWidth, 2.5, 'F');
+                doc.rect(contentX, y, contentW, 2.5, 'F');
                 y += 2.5 + 12;
 
                 // Datos de la organizadora
@@ -1170,8 +1177,8 @@
                 ];
                 doc.autoTable({
                     startY: y,
-                    margin: { left: 0, right: 0 },
-                    tableWidth: pageWidth,
+                    margin: { left: MARGIN_PAGE, right: MARGIN_PAGE },
+                    tableWidth: contentW,
                     theme: 'plain',
                     styles: {
                         font: FUENTE,
@@ -1184,8 +1191,8 @@
                         valign: 'middle'
                     },
                     columnStyles: {
-                        0: { fontStyle: 'bold', cellWidth: pageWidth / 3 },
-                        1: { cellWidth: pageWidth - pageWidth / 3 }
+                        0: { fontStyle: 'bold', cellWidth: contentW / 3 },
+                        1: { cellWidth: contentW - contentW / 3 }
                     },
                     alternateRowStyles: { fillColor: FILA_CLARA },
                     body: filasPago,
@@ -1220,7 +1227,7 @@
                 let lineasCond = [];
                 condicionesItems.forEach((item) => {
                     const bullet = item.indent === 0 ? '•  ' : '-  ';
-                    const wrapped = doc.splitTextToSize(bullet + item.texto, pageWidth - PAD * 2 - item.indent);
+                    const wrapped = doc.splitTextToSize(bullet + item.texto, contentW - PAD * 2 - item.indent);
                     wrapped.forEach((linea) => lineasCond.push({ texto: linea, indent: item.indent }));
                 });
                 checkSpace(20 + 16 + lineasCond.length * condLineH + 16);
@@ -1230,7 +1237,7 @@
                 doc.setTextColor(...COND_TEXTO);
                 let ly = y + 16;
                 lineasCond.forEach((l) => {
-                    doc.text(l.texto, PAD + l.indent, ly);
+                    doc.text(l.texto, contentX + PAD + l.indent, ly);
                     ly += condLineH;
                 });
                 doc.setTextColor(0, 0, 0);
@@ -1243,18 +1250,18 @@
                 const firmaLineY = y + 90;
                 doc.setDrawColor(...FIRMA_LINEA);
                 doc.setLineWidth(1);
-                doc.line(PAD, firmaLineY, colHalf - 20, firmaLineY);
+                doc.line(contentX, firmaLineY, colHalf - 20, firmaLineY);
                 doc.setFont(FUENTE, 'bold');
                 doc.setFontSize(9.5);
                 doc.setTextColor(...TITULO_OSCURO);
-                doc.text('Firma del Cliente', (PAD + colHalf - 20) / 2, firmaLineY + 14, { align: 'center' });
+                doc.text('Firma del Cliente', (contentX + colHalf - 20) / 2, firmaLineY + 14, { align: 'center' });
                 doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(8.5);
                 doc.setTextColor(...GRIS_TEXTO);
-                doc.text('DNI: _________________', (PAD + colHalf - 20) / 2, firmaLineY + 27, { align: 'center' });
+                doc.text('DNI: _________________', (contentX + colHalf - 20) / 2, firmaLineY + 27, { align: 'center' });
 
                 const col2Start = colHalf + 20;
-                const col2End = pageWidth - PAD;
+                const col2End = contentRight;
                 const col2Center = (col2Start + col2End) / 2;
                 if (firmaImg) {
                     const fH = 95;
@@ -1278,7 +1285,7 @@
                 // por si el contenido de arriba llegara a ocupar más de lo habitual)
                 const footerY = Math.max(pageHeight - 34, y + 20);
                 doc.setFillColor(...FOOTER_LINEA);
-                doc.rect(0, footerY, pageWidth, 1.5, 'F');
+                doc.rect(contentX, footerY, contentW, 1.5, 'F');
                 y = footerY + 16;
                 doc.setFont(FUENTE, 'normal');
                 doc.setFontSize(8.5);
