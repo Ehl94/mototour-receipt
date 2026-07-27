@@ -809,15 +809,6 @@
             <div class="seccion-titulo">RESUMEN DE PAGO</div>
             <table class="tabla-resumen">
                 <tr>
-                    <td>Moneda</td>
-                    <td>
-                        <select id="pago_moneda">
-                            <option value="ARS">ARS - Peso argentino</option>
-                            <option value="USD" selected>USD - Dólar</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
                     <td>Precio por persona</td>
                     <td>$ <input type="text" inputmode="decimal" id="pago_precio"></td>
                 </tr>
@@ -911,14 +902,6 @@
                 return `${dia}/${mes}/${anio}`;
             }
             return el.value || '';
-        }
-
-        // Formatea un campo de dinero con signo "$" y la moneda elegida en el selector
-        function montoUSD(id) {
-            const valor = valorCampo(id);
-            const selectMoneda = document.getElementById('pago_moneda');
-            const moneda = (selectMoneda && selectMoneda.value) || 'USD';
-            return valor ? `$ ${valor} ${moneda}` : '';
         }
 
         // Carga una imagen local como dataURL (necesario para incrustarla en el PDF)
@@ -1177,13 +1160,13 @@
                 y = 0;
                 seccionTitulo('RESUMEN DE PAGO');
                 const filasPago = [
-                    ['Precio por Persona', montoUSD('pago_precio')],
+                    ['Precio por Persona', '$ ' + valorCampo('pago_precio')],
                     ['Cantidad de Personas', valorCampo('pago_cantidad')],
-                    ['Subtotal', montoUSD('pago_subtotal')],
-                    ['Seña / Anticipo Abonado', montoUSD('pago_sena')],
+                    ['Subtotal', '$ ' + valorCampo('pago_subtotal')],
+                    ['Seña / Anticipo Abonado', '$ ' + valorCampo('pago_sena')],
                     ['Fecha de Pago de Seña', valorCampo('pago_fecha_sena')],
                     ['Método de Pago', valorCampo('pago_metodo')],
-                    ['SALDO PENDIENTE', montoUSD('pago_saldo')]
+                    ['SALDO PENDIENTE', '$ ' + valorCampo('pago_saldo')]
                 ];
                 doc.autoTable({
                     startY: y,
